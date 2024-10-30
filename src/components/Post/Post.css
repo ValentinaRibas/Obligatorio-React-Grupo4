@@ -1,0 +1,12 @@
+.post {
+    display: flex;
+    margin-bottom: 20px;
+    border: 1px solid #dbdbdb;
+    max-width: 400px;
+}
+  
+.post-image img {
+    width: 100%;
+    height: auto;
+    object-fit: 'cover';
+}
