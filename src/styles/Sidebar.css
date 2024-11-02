@@ -1,0 +1,43 @@
+.sidebar {
+  width: 200px;
+  background-color: #f4f4f4;
+  padding: 20px;
+  text-align: center;
+}
+
+.sidebar h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+
+.sidebar ul li.active {
+  font-weight: bold;
+  color: #000;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-icon {
+  margin-right: 10px;
+  font-size: 20px;
+}

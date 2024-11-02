@@ -1,0 +1,121 @@
+.profile-page {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+.sidebar h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.profile-main {
+  flex: 1;
+  padding: 20px 200px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin-right: 60px;
+  object-fit: cover;
+}
+
+.profile-details {
+  flex: 1;
+}
+
+.username-edit-container {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+}
+
+.username-edit-container h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.username-input {
+  font-size: 24px;
+  font-weight: bold;
+  /* margin-right: 10px; */
+  padding: 5px;
+}
+
+.edit-button {
+  background-color: #efefef;
+  border: 1px solid #efefef;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.edit-button:focus,
+.username-input:focus {
+  outline: none;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.profile-bio {
+  font-size: 14px;
+  color: #666;
+}
+
+.profile-photos {
+  display: grid;
+  grid-template-columns: repeat(3, 250px);
+  gap: 3px;
+  justify-content: center;
+}
+
+.profile-photo {
+  width: 250px;
+  height: 250px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.photo-button {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.photo-button:focus {
+  outline: none;
+}
