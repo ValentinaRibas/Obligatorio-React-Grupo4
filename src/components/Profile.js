@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import "../styles/Profile.css";
 import Sidebar from "../components/Sidebar";
-import profilePic from "../resources/images/Harrypotter.webp";
 
 const Profile = () => {
   const user = {
     username: "thechosenone",
     fullName: "Harry Potter",
-    profileImage: profilePic,
+    profileImage: "https://avatarfiles.alphacoders.com/375/thumb-1920-375208.png",
     bio: "The Boy Who Lived ⚡ | Gryffindor | Auror",
     followers: 1200,
     following: 350,
