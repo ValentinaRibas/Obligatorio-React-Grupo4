@@ -60,6 +60,13 @@
   margin: 0;
 }
 
+.username-input {
+  font-size: 24px;
+  font-weight: bold;
+  /* margin-right: 10px; */
+  padding: 5px;
+}
+
 .edit-button {
   background-color: #efefef;
   border: 1px solid #efefef;
@@ -67,6 +74,11 @@
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.edit-button:focus,
+.username-input:focus {
+  outline: none;
 }
 
 .profile-stats {
@@ -93,4 +105,17 @@
   height: 250px;
   object-fit: cover;
   object-position: center;
+}
+
+.photo-button {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.photo-button:focus {
+  outline: none;
 }
