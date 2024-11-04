@@ -10,3 +10,14 @@
     height: auto;
     object-fit: 'cover';
 }
+
+.media-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: auto;
+}
+
+.user-name {
+    display: flex;
+    align-items: baseline;
+}
