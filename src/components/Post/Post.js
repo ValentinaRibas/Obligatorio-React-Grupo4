@@ -4,19 +4,88 @@ import './Post.css';
 import heart_img from '../../images/heart.png'
 import black_heart_img from '../../images/heart_black.png'
 
-const Post = ({ profileImage, username, time, image, caption, likes, comments }) => {
+const Post = ({ postId, profileImage, username, time, image, caption, likes, comments }) => {
   const [likeImg, setLikeImg] = useState(heart_img);
   const [currentLikes, setLikes] = useState(likes);
   const [currentComments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
 
-  const handleLike = () => {
-    if (likeImg === heart_img){
-      setLikeImg(black_heart_img)
-      setLikes(currentLikes + 1)
-    } else{
-      setLikeImg(heart_img)
-      setLikes(currentLikes - 1)
+  useEffect(() => {
+    if (likes > 0) {
+      setLikeImg(black_heart_img);
     }
+  }, [likes]);
+
+  const handleLike = async () => {
+    if (likeImg === heart_img) {
+      try {
+        await likePost(postId);
+        setLikeImg(black_heart_img);
+        setLikes(currentLikes + 1);
+      } catch (error) {
+        console.error("Error al dar like:", error);
+      }
+    } else {
+      try {
+        await unlikePost(postId);
+        setLikeImg(heart_img);
+        setLikes(currentLikes - 1);
+      } catch (error) {
+        console.error("Error al quitar like:", error);
+      }
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (newComment.trim() === "") return;
+    try {
+      const comment = await addComment(postId, newComment);
+      setComments([...currentComments, comment]);
+      setNewComment("");
+    } catch (error) {
+      console.error("Error al agregar comentario:", error);
+    }
+  };
+
+  const likePost = async (postId) => {
+    const response = await fetch(`/api/posts/${postId}/like`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to like the post');
+    }
+  };
+
+  const unlikePost = async (postId) => {
+    const response = await fetch(`/api/posts/${postId}/like`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to unlike the post');
+    }
+  };
+
+  const addComment = async (postId, comment) => {
+    const response = await fetch(`/api/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ content: comment }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add comment');
+    }
+    const data = await response.json();
+    return data;
   };
 
   return (
@@ -48,6 +117,17 @@ const Post = ({ profileImage, username, time, image, caption, likes, comments })
           </p>
           <p className="subtitle is-7" style={{ display: 'flex' }}>View all {comments} comments</p>
         </div>
+        <form onSubmit={handleAddComment} className="add-comment mt-2">
+          <input
+            type="text"
+            className="input"
+            placeholder="Add a comment..."
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            style={{ padding: '10px', border: 'none' }}
+          />
+          <button type="submit" style={{ display: 'none' }}>Submit</button>
+        </form>
       </div>
     </div>
   );
