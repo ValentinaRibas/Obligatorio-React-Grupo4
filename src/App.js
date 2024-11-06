@@ -16,7 +16,8 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <div data-theme='light' className="App">
+    </div>
   );
 }
 
