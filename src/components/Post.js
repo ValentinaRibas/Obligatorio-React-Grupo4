@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import 'bulma/css/bulma.min.css';
-import './Post.css';
-import heart_img from '../../images/heart.png'
-import black_heart_img from '../../images/heart_black.png'
+import '../styles/Post.css';
+import heart_img from '../images/heart.png'
+import black_heart_img from '../images/heart_black.png'
 
 const Post = ({ postId, profileImage, username, time, image, caption, likes, comments }) => {
   const [likeImg, setLikeImg] = useState(heart_img);

@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Profile from "./components/Profile";
+import Feed from "./components/Feed";
 // import Home from "./components/Home";
 // import Notifications from "./components/Notifications";
 // import Create from "./components/Create";
@@ -11,8 +12,8 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
-          {/* <Route path="/" element={<Home />} />
-          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/" element={<Feed />} />
+          {/*<Route path="/notifications" element={<Notifications />} />
           <Route path="/create" element={<Create />} /> */}
           <Route path="/profile" element={<Profile />} />
         </Routes>
