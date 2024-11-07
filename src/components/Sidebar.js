@@ -5,6 +5,8 @@ import { FiHome, FiHeart, FiPlusSquare, FiUser } from "react-icons/fi";
 
 const Sidebar = () => {
   const location = useLocation();
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const userId = storedUser ? storedUser._id : null;
 
   return (
     <aside className="sidebar">
@@ -25,10 +27,16 @@ const Sidebar = () => {
             <FiPlusSquare className="sidebar-icon" /> Create
           </Link>
         </li>
-        <li className={location.pathname === "/profile" ? "active" : ""}>
-          <Link to="/profile">
-            <FiUser className="sidebar-icon" /> Profile
-          </Link>
+        <li className={location.pathname === `/profile/${userId}` ? "active" : ""}>
+          {userId ? (
+            <Link to={`/profile/${userId}`}>
+              <FiUser className="sidebar-icon" /> Profile
+            </Link>
+          ) : (
+            <span>
+              <FiUser className="sidebar-icon" /> Profile
+            </span>
+          )}
         </li>
       </ul>
     </aside>
