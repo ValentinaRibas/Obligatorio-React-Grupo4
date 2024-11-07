@@ -12,6 +12,7 @@ const Profile = () => {
   const [photos, setPhotos] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
+  const [description, setDescription] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [isFriend, setIsFriend] = useState(false);
@@ -36,6 +37,7 @@ const Profile = () => {
             following: 350,
           });
           setUsername(data.user.username);
+          setDescription(data.user.description);
           setIsFriend(data.user.friends.includes(currentUserId));
         } else {
           console.error("Error fetching profile data");
@@ -116,8 +118,38 @@ const Profile = () => {
   };
 
   const handleEditClick = () => setIsEditing(true);
+
+  const handleSaveClick = async () => {
+    const updatedData = {
+      username: username || user.username,
+      profilePicture: user.profilePicture || "",
+      description: description || user.description,
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/profile/edit`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      const data = await response.json();
+      setUser({ ...user, ...data });
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleUsernameChange = (e) => setUsername(e.target.value);
-  const handleSaveClick = () => setIsEditing(false);
+  const handleDescriptionChange = (e) => setDescription(e.target.value);
 
   const handleOpenModal = (post) => {
     setSelectedPost(post);
@@ -184,7 +216,19 @@ const Profile = () => {
                 <strong>Following</strong> {user.following}
               </p>
             </div>
-            <p className="profile-bio">{user.description || "No bio available"}</p>
+            <div className="profile-bio">
+              {isEditing ? (
+                <input
+                  type="text"
+                  value={description}
+                  onChange={handleDescriptionChange}
+                  className="description-input"
+                  placeholder="Add a description"
+                />
+              ) : (
+                <p>{description || "No bio available"}</p>
+              )}
+            </div>
           </div>
         </div>
 
