@@ -81,13 +81,16 @@ const Profile = () => {
 
   const handleAddFriend = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/user/add-friend/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/user/add-friend/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.ok) {
         setIsFriend(true);
       } else {
@@ -100,13 +103,16 @@ const Profile = () => {
 
   const handleRemoveFriend = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/user/remove-friend/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/user/remove-friend/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.ok) {
         setIsFriend(false);
       } else {
@@ -254,7 +260,10 @@ const Profile = () => {
 
       {isModalOpen && selectedPost && (
         <div className="custom-modal">
-          <div className="custom-modal-overlay" onClick={handleCloseModal}></div>
+          <div
+            className="custom-modal-overlay"
+            onClick={handleCloseModal}
+          ></div>
           <div className="custom-modal-content">
             <button className="close-button" onClick={handleCloseModal}>
               &times;
