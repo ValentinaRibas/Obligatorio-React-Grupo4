@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import "../styles/Profile.css";
 import Sidebar from "../components/Sidebar";
+import Post from "../components/Post";
 
 const BASE_URL = "http://localhost:3001";
 
 const Profile = () => {
+  const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
+  const [isFriend, setIsFriend] = useState(false);
 
-  const token = "token";
-  const userId = "userid";
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const currentUserId = storedUser?._id;
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -24,12 +31,12 @@ const Profile = () => {
         if (response.ok) {
           const data = await response.json();
           setUser({
-            ...data,
+            ...data.user,
             followers: 1200,
             following: 350,
-            bio: "The Boy Who Lived ⚡ | Gryffindor | Auror",
           });
-          setUsername(data.username);
+          setUsername(data.user.username);
+          setIsFriend(data.user.friends.includes(currentUserId));
         } else {
           console.error("Error fetching profile data");
         }
@@ -48,9 +55,15 @@ const Profile = () => {
         if (response.ok) {
           const data = await response.json();
           const userPosts = data.filter((post) => post.user._id === userId);
-          const imageUrls = userPosts.map(
-            (post) => `${BASE_URL}/${post.imageUrl}`
-          );
+          const imageUrls = userPosts.map((post) => ({
+            id: post._id,
+            imageUrl: `${BASE_URL}/${post.imageUrl}`,
+            caption: post.caption,
+            likes: post.likes.length,
+            comments: post.comments.length,
+            username: post.user.username,
+            profileImage: post.user.profilePicture,
+          }));
           setPhotos(imageUrls);
         } else {
           console.error("Error fetching posts");
@@ -62,12 +75,59 @@ const Profile = () => {
 
     fetchUserData();
     fetchUserPosts();
-  }, [userId, token]);
+  }, [userId, token, currentUserId]);
+
+  const handleAddFriend = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/add-friend/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        setIsFriend(true);
+      } else {
+        console.error("Error adding friend");
+      }
+    } catch (error) {
+      console.error("Error adding friend:", error);
+    }
+  };
+
+  const handleRemoveFriend = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/remove-friend/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        setIsFriend(false);
+      } else {
+        console.error("Error removing friend");
+      }
+    } catch (error) {
+      console.error("Error removing friend:", error);
+    }
+  };
 
   const handleEditClick = () => setIsEditing(true);
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handleSaveClick = () => setIsEditing(false);
-  const handleImageClick = (index) => alert(`Image ${index + 1} clicked!`);
+
+  const handleOpenModal = (post) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
+  };
 
   if (!user) return <p>Loading...</p>;
 
@@ -79,7 +139,7 @@ const Profile = () => {
           <img
             src={
               user.profilePicture
-                ? `${BASE_URL}/${user.profilePicture}`
+                ? user.profilePicture
                 : "https://via.placeholder.com/150"
             }
             alt="Profile"
@@ -97,12 +157,21 @@ const Profile = () => {
               ) : (
                 <h2>{username}</h2>
               )}
-              <button
-                className="edit-button"
-                onClick={isEditing ? handleSaveClick : handleEditClick}
-              >
-                {isEditing ? "Save" : "Edit Profile"}
-              </button>
+              {userId === currentUserId ? (
+                <button
+                  className="edit-button"
+                  onClick={isEditing ? handleSaveClick : handleEditClick}
+                >
+                  {isEditing ? "Save" : "Edit Profile"}
+                </button>
+              ) : (
+                <button
+                  className="edit-button"
+                  onClick={isFriend ? handleRemoveFriend : handleAddFriend}
+                >
+                  {isFriend ? "Remove Friend" : "Add Friend"}
+                </button>
+              )}
             </div>
             <div className="profile-stats">
               <p>
@@ -115,7 +184,7 @@ const Profile = () => {
                 <strong>Following</strong> {user.following}
               </p>
             </div>
-            <p className="profile-bio">{user.bio}</p>
+            <p className="profile-bio">{user.description || "No bio available"}</p>
           </div>
         </div>
 
@@ -124,10 +193,10 @@ const Profile = () => {
             <button
               key={index}
               className="photo-button"
-              onClick={() => handleImageClick(index)}
+              onClick={() => handleOpenModal(photo)}
             >
               <img
-                src={photo}
+                src={photo.imageUrl}
                 alt={`Post ${index}`}
                 className="profile-photo"
                 onError={(e) => {
@@ -138,6 +207,27 @@ const Profile = () => {
           ))}
         </div>
       </main>
+
+      {isModalOpen && selectedPost && (
+        <div className="custom-modal">
+          <div className="custom-modal-overlay" onClick={handleCloseModal}></div>
+          <div className="custom-modal-content">
+            <button className="close-button" onClick={handleCloseModal}>
+              &times;
+            </button>
+            <Post
+              postId={selectedPost.id}
+              profileImage={selectedPost.profileImage}
+              username={selectedPost.username}
+              time="2 hours ago"
+              image={selectedPost.imageUrl}
+              caption={selectedPost.caption}
+              likes={selectedPost.likes}
+              comments={selectedPost.comments}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
