@@ -21,12 +21,14 @@ const LoginForm = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-        
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data));
-
-        navigate(`/profile/${data._id}`);
+        if (data.token && data._id) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("user", JSON.stringify(data));
+          console.log(data);
+          navigate(`/profile/${data._id}`);
+        } else {
+          console.error("Login failed");
+        }
       })
       .catch((err) => console.log(err));
   };

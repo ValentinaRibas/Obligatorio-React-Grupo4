@@ -3,28 +3,6 @@
   min-height: 100vh;
 }
 
-.sidebar {
-  width: 200px;
-  background-color: #f4f4f4;
-  padding: 20px;
-}
-
-.sidebar h1 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.sidebar ul {
-  list-style: none;
-  padding: 0;
-}
-
-.sidebar ul li {
-  margin-bottom: 10px;
-  cursor: pointer;
-}
-
 .profile-main {
   flex: 1;
   padding: 20px 200px;
@@ -40,8 +18,9 @@
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  margin-right: 60px;
+  margin-right: 40px;
   object-fit: cover;
+  margin-left: 15px;
 }
 
 .profile-details {
@@ -163,3 +142,4 @@
 .close-button:hover {
   color: #000;
 }
+

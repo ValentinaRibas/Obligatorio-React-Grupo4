@@ -23,10 +23,11 @@ const RegisterForm = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.token && data.userId) {
+        if (data.token && data._id) {
           localStorage.setItem("token", data.token);
-          localStorage.setItem("userId", data.userId);
-          navigate(`/profile/${data.userId}`);
+          localStorage.setItem("user", JSON.stringify(data));
+          console.log(data);
+          navigate(`/profile/${data._id}`);
         } else {
           console.error("Registration failed");
         }
