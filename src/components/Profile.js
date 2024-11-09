@@ -10,8 +10,9 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
 
-  const token = "token";
-  const userId = "userid";
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmJlOTlhNTczYmU1Y2RmZjdiMTc2ZSIsImlhdCI6MTczMDkzMTA5OCwiZXhwIjoxNzMzNTIzMDk4fQ.Jtj3wi5B9hgxFoRaDlxIleyelrJ5ZhlFpyqcXrapxu0";
+  const userId = "672be99a573be5cdff7b176e";
+  const profilepic = "https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp"
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -29,7 +30,7 @@ const Profile = () => {
             following: 350,
             bio: "The Boy Who Lived ⚡ | Gryffindor | Auror",
           });
-          setUsername(data.username);
+          setUsername(data.user.username);
         } else {
           console.error("Error fetching profile data");
         }

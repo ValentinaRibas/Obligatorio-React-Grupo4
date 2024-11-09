@@ -8,25 +8,18 @@ const Feed = () => {
 
   const [posts, setPosts] = useState([]);
 
+  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmJlOTlhNTczYmU1Y2RmZjdiMTc2ZSIsImlhdCI6MTczMDkzMTA5OCwiZXhwIjoxNzMzNTIzMDk4fQ.Jtj3wi5B9hgxFoRaDlxIleyelrJ5ZhlFpyqcXrapxu0";
 
   const getPosts = async () => {
     const response = await fetch('http://localhost:3001/api/posts/feed', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      .then(response => response.json())
-      .then(data => {
-    
-        console.log(data);
-      })
-      .catch(error => {
-        console.error('Error al obtener el feed de publicaciones:', error);
-      });
-  }
-
-  //algunas publicaciones de ejemplo y despues implementamos el componente hecho por vale
-
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await response.json();
+    console.log(data); 
+    console.log("data arriba");
+  };
 
     useEffect(() =>{
         getPosts()
@@ -41,33 +34,33 @@ const Feed = () => {
             <div className="feed-container">
             <Post 
             postId="10" 
-            profileImage="" 
+            profileImage="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp" 
             username="AndyChristoff" 
             time="10:50pm" 
-            image="" 
+            image="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp" 
             caption="Aca en la playa tranqui" 
             likes="152" 
             comments="">
             </Post>
             <Post 
             postId="10" 
-            profileImage="" 
+            profileImage="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp" 
             username="AndyChristoff" 
             time="10:50pm" 
-            image="" 
+            image="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp" 
             caption="Aca en la playa tranqui" 
             likes="152" 
-            comments="">
+            comments="123">
             </Post>
             <Post 
             postId="10" 
-            profileImage="" 
+            profileImage="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp" 
             username="AndyChristoff" 
             time="10:50pm" 
-            image="" 
+            image="https://img-cdn.pixlr.com/image-generator/history/65bb506dcb310754719cf81f/ede935de-1138-4f66-8ed7-44bd16efc709/medium.webp" 
             caption="Aca en la playa tranqui" 
             likes="152" 
-            comments="">
+            comments="123">
             </Post> 
             </div>
         </main>
