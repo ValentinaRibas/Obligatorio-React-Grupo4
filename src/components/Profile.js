@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/Profile.css";
 import Sidebar from "../components/Sidebar";
@@ -13,6 +13,8 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
+  const [profilePic, setProfilePic] = useState("");
+  const fileInputRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
   const [isFriend, setIsFriend] = useState(false);
@@ -38,6 +40,7 @@ const Profile = () => {
           });
           setUsername(data.user.username);
           setDescription(data.user.description);
+          setProfilePic(data.user.profilePicture);
           setIsFriend(data.user.friends.includes(currentUserId));
         } else {
           console.error("Error fetching profile data");
@@ -128,13 +131,13 @@ const Profile = () => {
   const handleSaveClick = async () => {
     const updatedData = {
       username: username || user.username,
-      profilePicture: user.profilePicture || "",
+      profilePicture: profilePic || "",
       description: description || user.description,
     };
 
     try {
       const response = await fetch(`${BASE_URL}/api/user/profile/edit`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -167,6 +170,29 @@ const Profile = () => {
     setSelectedPost(null);
   };
 
+  const handleImageClick = () => {
+    if(isEditing){
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const base64 = await convertToBase64(file);
+      setProfilePic(base64);
+    }
+  };
+
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   if (!user) return <p>Loading...</p>;
 
   return (
@@ -174,14 +200,21 @@ const Profile = () => {
       <Sidebar />
       <main className="profile-main">
         <div className="profile-header">
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
           <img
             src={
-              user.profilePicture
-                ? user.profilePicture
+              profilePic
+                ? profilePic
                 : "https://via.placeholder.com/150"
             }
             alt="Profile"
             className="profile-image"
+            onClick={handleImageClick}
           />
           <div className="profile-details">
             <div className="username-edit-container">
