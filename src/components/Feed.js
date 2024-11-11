@@ -8,7 +8,7 @@ const Feed = () => {
 
   const [posts, setPosts] = useState([]);
 
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MmJlOTlhNTczYmU1Y2RmZjdiMTc2ZSIsImlhdCI6MTczMDkzMTA5OCwiZXhwIjoxNzMzNTIzMDk4fQ.Jtj3wi5B9hgxFoRaDlxIleyelrJ5ZhlFpyqcXrapxu0";
+  const token = localStorage.getItem("token");
 
   const getPosts = async () => {
     const response = await fetch('http://localhost:3001/api/posts/feed', {
