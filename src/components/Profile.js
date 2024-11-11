@@ -131,8 +131,8 @@ const Profile = () => {
   const handleSaveClick = async () => {
     const updatedData = {
       username: username || user.username,
-      profilePicture: profilePic || "",
       description: description || user.description,
+      profilePicture: profilePic || user.profilePicture
     };
 
     try {
