@@ -5,6 +5,7 @@ import '../styles/Post.css';
 
 const CreatePost = ({}) => {
     const [photo, setPhoto] = useState("")
+    const [file, setFile] = useState(null)
     const [description, setDescription] = useState("");
     const token = localStorage.getItem("token");
     const User = JSON.parse(localStorage.getItem("user"));
@@ -16,6 +17,7 @@ const CreatePost = ({}) => {
       if (file) {
         const base64 = await convertToBase64(file);
         setPhoto(base64);
+        setFile(file);
       }
     };
   
@@ -41,6 +43,10 @@ const CreatePost = ({}) => {
             imageUrl: photo || "",
             caption: description,
         };
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('user', User);
     
         try {
           const response = await fetch(`${BASE_URL}/api/posts/upload`,
@@ -50,7 +56,7 @@ const CreatePost = ({}) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify(postData),
+              body: formData,
           });
           console.log(response.data);
           setPhoto(null);
