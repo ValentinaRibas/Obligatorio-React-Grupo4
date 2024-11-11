@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import 'bulma/css/bulma.min.css';
 import '../styles/Post.css';
 
-const User = {
-    _id: 1,
-    username: "Juan",
-    profileImage: "https://via.placeholder.com/150"
-}
 
-const Create = ({}) => {
+const CreatePost = ({}) => {
     const [photo, setPhoto] = useState("")
     const [description, setDescription] = useState("");
     const token = localStorage.getItem("token");
+    const User = JSON.parse(localStorage.getItem("user"));
+    const currentUserId = User?._id;
+    const BASE_URL = "http://localhost:3001";
 
     const handleFileChange = async (event) => {
       const file = event.target.files[0];
@@ -30,7 +28,9 @@ const Create = ({}) => {
       });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         if (!photo || !description) {
           alert("Ingrese una foto y una descripción");
           return;
@@ -43,7 +43,7 @@ const Create = ({}) => {
         };
     
         try {
-          const response = await fetch('/api/posts',
+          const response = await fetch(`${BASE_URL}/api/posts/upload`,
             {
               method: "POST",
               headers: {
@@ -98,4 +98,4 @@ const Create = ({}) => {
   );
 };
 
-export default Create;
+export default CreatePost;
