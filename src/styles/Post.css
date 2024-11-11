@@ -4,6 +4,10 @@
     border: 1px solid #dbdbdb;
     max-width: 400px;
 }
+
+.image {
+    border-radius: 50px;
+}
   
 .post-image img {
     width: 100%;
@@ -20,4 +24,12 @@
 .user-name {
     display: flex;
     align-items: baseline;
+}
+
+.new-post {
+    display: flex;
+    margin: 20px;
+    border: 1px solid #dbdbdb;
+    max-width: 400px;
+    flex-direction: column;
 }
