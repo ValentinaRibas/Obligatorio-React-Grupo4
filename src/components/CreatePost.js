@@ -37,15 +37,9 @@ const CreatePost = ({}) => {
           alert("Ingrese una foto y una descripción");
           return;
         }
-    
-        const postData = {
-            user: User,
-            imageUrl: photo || "",
-            caption: description,
-        };
 
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('image', file);
         formData.append('user', User);
     
         try {
@@ -53,7 +47,6 @@ const CreatePost = ({}) => {
             {
               method: "POST",
               headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
               body: formData,
@@ -72,7 +65,7 @@ const CreatePost = ({}) => {
         <div className="media-container">
           <div className="media-left">
             <figure className="image is-48x48">
-              <img src={User.profileImage} alt="Profile" />
+              <img src={User.profilePicture} alt="Profile" />
             </figure>
           </div>
           <div className="media-content user-name">

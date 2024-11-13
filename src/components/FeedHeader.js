@@ -15,7 +15,7 @@ return (
                     <button className="icon-button">
                     <Heart color={"red"} size={34} />
                     </button>
-                    <button className="icon-button" onClick={() => navigate('/upload')}>
+                    <button className="icon-button" onClick={() => navigate('/create')}>
                     <Plus size={34} />
                     </button>
                 </div>

@@ -22,7 +22,7 @@ function App() {
           <Route path="/" element={<Feed />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/upload" element={<CreatePost />} />
+          <Route path="/create" element={<CreatePost />} />
           <Route
             path="/profile/:userId"
             element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
