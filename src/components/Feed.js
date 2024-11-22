@@ -19,7 +19,11 @@ const Feed = () => {
     });
     const data = await response.json();
     if (response.ok) {
-      setPosts(data);
+      const formattedPosts = data.map((post) => ({
+        ...post,
+        comments: post.comments.length,
+      }));
+      setPosts(formattedPosts);
     } else {
       console.error("Failed to fetch posts:", data);
     }
@@ -46,7 +50,7 @@ const Feed = () => {
               time={post.createdAt}
               image={apiUrl + "/" + post.imageUrl}
               caption={post.caption}
-              likes={post.likes}
+              likes={post.likes.length}
               comments={post.comments}
             />
           ))}
