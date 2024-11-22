@@ -1,16 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import 'bulma/css/bulma.min.css';
-import '../styles/Post.css';
-import heart_img from '../images/heart.png';
-import black_heart_img from '../images/heart_black.png';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "bulma/css/bulma.min.css";
+import "../styles/Post.css";
+import heart_img from "../images/heart.png";
+import black_heart_img from "../images/heart_black.png";
 
-const Post = ({ postId, profileImage, username, userId, time, image, caption, likes, comments }) => {
+const Post = ({
+  postId,
+  profileImage,
+  username,
+  userId,
+  currentUserId,
+  time,
+  image,
+  caption,
+  likes,
+  comments,
+}) => {
   const [likeImg, setLikeImg] = useState(heart_img);
   const [currentLikes, setLikes] = useState(likes);
   const [currentComments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-  
+
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
 
@@ -27,7 +38,7 @@ const Post = ({ postId, profileImage, username, userId, time, image, caption, li
         setLikeImg(black_heart_img);
         setLikes(currentLikes + 1);
       } catch (error) {
-        console.error("Error al dar like:", error);
+        console.error("Error to add like", error);
       }
     } else {
       try {
@@ -35,7 +46,7 @@ const Post = ({ postId, profileImage, username, userId, time, image, caption, li
         setLikeImg(heart_img);
         setLikes(currentLikes - 1);
       } catch (error) {
-        console.error("Error al quitar like:", error);
+        console.error("Error to remove like:", error);
       }
     }
   };
@@ -54,76 +65,101 @@ const Post = ({ postId, profileImage, username, userId, time, image, caption, li
 
   const likePost = async (postId) => {
     const response = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to like the post');
+      throw new Error("Failed to like the post");
     }
   };
 
   const unlikePost = async (postId) => {
     const response = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to unlike the post');
+      throw new Error("Failed to unlike the post");
     }
   };
 
   const addComment = async (postId, comment) => {
     const response = await fetch(`${BASE_URL}/api/posts/${postId}/comments`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
       body: JSON.stringify({ content: comment }),
     });
     if (!response.ok) {
-      throw new Error('Failed to add comment');
+      throw new Error("Failed to add comment");
     }
     const data = await response.json();
     return data;
   };
 
   const handleProfileClick = () => {
-    navigate(`/profile/${userId}`);
+    if (userId !== currentUserId) {
+      navigate(`/profile/${userId}`);
+    }
   };
 
   return (
     <div className="post card">
       <div className="card-content">
         <div className="media-container">
-          <div className="media-left" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
+          <div
+            className="media-left"
+            onClick={handleProfileClick}
+            style={{ cursor: "pointer" }}
+          >
             <figure className="image is-48x48">
               <img src={profileImage} alt="Profile" />
             </figure>
           </div>
-          <div className="media-content user-name" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
-            <p className="title is-6" style={{ marginRight: '3px' }}>{username}</p>
+          <div
+            className="media-content user-name"
+            onClick={handleProfileClick}
+            style={{ cursor: "pointer" }}
+          >
+            <p className="title is-6" style={{ marginRight: "3px" }}>
+              {username}
+            </p>
             <p className="subtitle is-7">{time}</p>
           </div>
         </div>
-        <div className="post-image" style={{ display: 'flex' }}>
-          <figure className="image" style={{ display: 'flex', alignItems: 'center' }}>
+        <div className="post-image" style={{ display: "flex" }}>
+          <figure
+            className="image"
+            style={{ display: "flex", alignItems: "center" }}
+          >
             <img src={image} alt="Post" />
           </figure>
         </div>
         <div className="content">
-          <figure className="image is-24x24 my-2" style={{ display: 'flex', alignItems: 'center' }}>
+          <figure
+            className="image is-24x24 my-2"
+            style={{ display: "flex", alignItems: "center" }}
+          >
             <img src={likeImg} alt="Like" onClick={handleLike} />
           </figure>
-          <p className="subtitle is-7" style={{ display: 'flex' }}>{currentLikes} likes</p>
-          <p className="subtitle is-7" style={{ display: 'flex' }}>
-            <strong className='pr-1' style={{ color: '#1E1E1E' }}>{username}</strong> {caption}
+          <p className="subtitle is-7" style={{ display: "flex" }}>
+            {currentLikes} likes
           </p>
-          <p className="subtitle is-7" style={{ display: 'flex' }}>View all {comments} comments</p>
+          <p className="subtitle is-7" style={{ display: "flex" }}>
+            <strong className="pr-1" style={{ color: "#1E1E1E" }}>
+              {username}
+            </strong>{" "}
+            {caption}
+          </p>
+          <p className="subtitle is-7" style={{ display: "flex" }}>
+            View all {comments} comments
+          </p>
         </div>
         <form onSubmit={handleAddComment} className="add-comment mt-2">
           <input
@@ -132,9 +168,11 @@ const Post = ({ postId, profileImage, username, userId, time, image, caption, li
             placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            style={{ padding: '10px', border: 'none' }}
+            style={{ padding: "10px", border: "none" }}
           />
-          <button type="submit" style={{ display: 'none' }}>Submit</button>
+          <button type="submit" style={{ display: "none" }}>
+            Submit
+          </button>
         </form>
       </div>
     </div>

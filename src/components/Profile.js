@@ -88,22 +88,28 @@ const Profile = () => {
 
   const handleAddFriend = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/user/add-friend/${userId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
+      const response = await fetch(
+        `${BASE_URL}/api/user/add-friend/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (response.ok) {
         setIsFriend(true);
       } else {
         const errorData = await response.json();
-        if (errorData.message === "Este usuario ya es tu amigo") {
+        if (errorData.message === "This user is already your friend") {
           setIsFriend(true);
         }
-        console.error("Error adding friend:", errorData.message || response.statusText);
+        console.error(
+          "Error adding friend:",
+          errorData.message || response.statusText
+        );
       }
     } catch (error) {
       console.error("Error adding friend:", error);
@@ -112,13 +118,16 @@ const Profile = () => {
 
   const handleRemoveFriend = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/user/remove-friend/${userId}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/user/remove-friend/${userId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.ok) {
         setIsFriend(false);
       } else {
@@ -131,18 +140,20 @@ const Profile = () => {
 
   const handleEditClick = () => setIsEditing(true);
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setUsername(user.username);
+    setDescription(user.description);
+    setProfilePic(user.profilePicture);
+  };
+
   const handleSaveClick = async () => {
-    if (!username.trim() || !description.trim()) {
-      console.error("Username and description cannot be empty");
-      return;
-    }
-  
     const updatedData = {
       username: username || user.username,
       description: description || user.description,
       profilePicture: profilePic || user.profilePicture,
     };
-  
+
     try {
       const response = await fetch(`${BASE_URL}/api/user/profile/edit`, {
         method: "PUT",
@@ -152,21 +163,26 @@ const Profile = () => {
         },
         body: JSON.stringify(updatedData),
       });
-  
+
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error updating profile:", errorData);
-        throw new Error(errorData.message || "Failed to update profile");
+        let errorMessage = "An error occurred. Please try again";
+        if (response.status === 500 && username !== user.username) {
+          errorMessage =
+            "This username is already in use. Please choose another one";
+        }
+        alert(errorMessage);
+        return;
       }
-  
+
       const data = await response.json();
       setUser({ ...user, ...data });
       setIsEditing(false);
     } catch (error) {
-      console.error("Error during profile update:", error);
+      console.error("Error during profile update:", error.message);
+      alert("A server error occurred. Please try again later");
     }
   };
-  
+
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handleDescriptionChange = (e) => setDescription(e.target.value);
 
@@ -225,27 +241,36 @@ const Profile = () => {
             alt="Profile"
             className="profile-image"
             onClick={handleImageClick}
+            style={{ cursor: isEditing ? "pointer" : "default" }}
           />
           <div className="profile-details">
             <div className="username-edit-container">
               {isEditing ? (
-                <input
-                  type="text"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  className="username-input"
-                />
+                <>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    className="username-input"
+                  />
+                  <button className="edit-button" onClick={handleSaveClick}>
+                    Save
+                  </button>
+                  <button className="cancel-button" onClick={handleCancelEdit}>
+                    Cancel
+                  </button>
+                </>
               ) : (
-                <h2>{username}</h2>
+                <>
+                  <h2>{username}</h2>
+                  {userId === currentUserId && (
+                    <button className="edit-button" onClick={handleEditClick}>
+                      Edit Profile
+                    </button>
+                  )}
+                </>
               )}
-              {userId === currentUserId ? (
-                <button
-                  className="edit-button"
-                  onClick={isEditing ? handleSaveClick : handleEditClick}
-                >
-                  {isEditing ? "Save" : "Edit Profile"}
-                </button>
-              ) : (
+              {userId !== currentUserId && (
                 <button
                   className="edit-button"
                   onClick={isFriend ? handleRemoveFriend : handleAddFriend}
@@ -292,7 +317,9 @@ const Profile = () => {
                 src={photo.imageUrl}
                 alt={`Post ${index}`}
                 className="profile-photo"
-                onError={(e) => (e.target.src = "https://via.placeholder.com/250")}
+                onError={(e) =>
+                  (e.target.src = "https://via.placeholder.com/250")
+                }
               />
             </button>
           ))}
@@ -301,7 +328,10 @@ const Profile = () => {
 
       {isModalOpen && selectedPost && (
         <div className="custom-modal">
-          <div className="custom-modal-overlay" onClick={handleCloseModal}></div>
+          <div
+            className="custom-modal-overlay"
+            onClick={handleCloseModal}
+          ></div>
           <div className="custom-modal-content">
             <button className="close-button" onClick={handleCloseModal}>
               &times;
