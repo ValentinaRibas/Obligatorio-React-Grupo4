@@ -20,8 +20,9 @@ const Feed = () => {
     const data = await response.json();
     if (response.ok) {
       setPosts(data);
+    } else {
+      console.error("Failed to fetch posts:", data);
     }
-    console.log(data);
   };
 
   useEffect(() => {
@@ -45,8 +46,8 @@ const Feed = () => {
               time={post.createdAt}
               image={apiUrl + "/" + post.imageUrl}
               caption={post.caption}
-              likes={post.likes.length}
-              comments={post.comments.length}
+              likes={post.likes}
+              comments={post.comments}
             />
           ))}
         </div>

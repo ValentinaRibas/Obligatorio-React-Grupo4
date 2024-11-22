@@ -14,22 +14,27 @@ const Post = ({
   time,
   image,
   caption,
-  likes,
-  comments,
+  likes = [],
+  comments = [],
 }) => {
-  const [likeImg, setLikeImg] = useState(heart_img);
-  const [currentLikes, setLikes] = useState(likes);
-  const [currentComments, setComments] = useState(comments || []);
+  const [likeImg, setLikeImg] = useState(
+    Array.isArray(likes) && likes.includes(currentUserId)
+      ? black_heart_img
+      : heart_img
+  );
+  const [currentLikes, setLikes] = useState(
+    Array.isArray(likes) ? likes.length : 0
+  );
+  const [currentComments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+  const [showComments, setShowComments] = useState(false);
 
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (likes > 0) {
-      setLikeImg(black_heart_img);
-    }
-  }, [likes]);
+    fetchComments();
+  }, [comments]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -39,23 +44,44 @@ const Post = ({
     return `${day}/${month}/${year}`;
   };
 
+  const fetchComments = async () => {
+    try {
+      const fetchedComments = await Promise.all(
+        comments.map(async (commentId) => {
+          const response = await fetch(
+            `${BASE_URL}/api/posts/comments/${commentId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch comments");
+          }
+          const data = await response.json();
+          return data;
+        })
+      );
+      setComments(fetchedComments);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
   const handleLike = async () => {
-    if (likeImg === heart_img) {
-      try {
+    try {
+      if (likeImg === heart_img) {
         await likePost(postId);
         setLikeImg(black_heart_img);
-        setLikes(currentLikes + 1);
-      } catch (error) {
-        console.error("Error adding like", error);
-      }
-    } else {
-      try {
+        setLikes((prev) => prev + 1);
+      } else {
         await unlikePost(postId);
         setLikeImg(heart_img);
-        setLikes(currentLikes - 1);
-      } catch (error) {
-        console.error("Error removing like:", error);
+        setLikes((prev) => prev - 1);
       }
+    } catch (error) {
+      console.error("Error updating like:", error);
     }
   };
 
@@ -64,9 +90,23 @@ const Post = ({
     if (newComment.trim() === "") return;
 
     try {
-      const comment = await addComment(postId, newComment);
-      setComments([...currentComments, comment]);
+      const response = await fetch(`${BASE_URL}/api/posts/${postId}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ content: newComment }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add comment");
+      }
+
+      const comment = await response.json();
+      setComments((prev) => [...prev, comment]);
       setNewComment("");
+      fetchComments(); // Fetch updated comments after adding
     } catch (error) {
       console.error("Error adding comment:", error);
     }
@@ -96,26 +136,14 @@ const Post = ({
     }
   };
 
-  const addComment = async (postId, comment) => {
-    const response = await fetch(`${BASE_URL}/api/posts/${postId}/comments`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: JSON.stringify({ content: comment }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to add comment");
-    }
-    const data = await response.json();
-    return data;
-  };
-
   const handleProfileClick = () => {
     if (userId !== currentUserId) {
       navigate(`/profile/${userId}`);
     }
+  };
+
+  const toggleComments = () => {
+    setShowComments((prev) => !prev);
   };
 
   return (
@@ -179,9 +207,22 @@ const Post = ({
             {caption && <span style={{ marginLeft: "5px" }}>{caption}</span>}
           </p>
           {currentComments.length > 0 && (
-            <p className="subtitle is-7" style={{ display: "flex" }}>
+            <p
+              className="subtitle is-7"
+              style={{ display: "flex", cursor: "pointer" }}
+              onClick={toggleComments}
+            >
               View all {currentComments.length} comments
             </p>
+          )}
+          {showComments && (
+            <div style={{ marginTop: "10px", fontSize: "0.8rem" }}>
+              {currentComments.map((comment) => (
+                <p key={comment._id}>
+                  <strong>{comment.user?.username}</strong>: {comment.content}
+                </p>
+              ))}
+            </div>
           )}
         </div>
         <form onSubmit={handleAddComment} className="add-comment mt-2">
