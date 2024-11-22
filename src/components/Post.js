@@ -171,9 +171,21 @@ const Post = ({
         <div className="media-container">
           <div className="media-left" onClick={handleProfileClick}>
             <figure className="image is-48x48">
-              <img src={profileImage} alt="Profile" />
+              <img
+                src={
+                  profileImage ||
+                  "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0="
+                }
+                alt="Profile"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=";
+                }}
+              />
             </figure>
           </div>
+
           <div className="media-content">
             <p className="username" onClick={handleProfileClick}>
               {username}

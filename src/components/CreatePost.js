@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "bulma/css/bulma.min.css";
-import "../styles/Post.css";
+import "../styles/CreatePost.css";
 
 const CreatePost = () => {
   const [photo, setPhoto] = useState("");
   const [file, setFile] = useState(null);
   const [description, setDescription] = useState("");
+  const navigate = useNavigate();
+
   const token = localStorage.getItem("token");
   const User = JSON.parse(localStorage.getItem("user"));
   const currentUserId = User?._id;
@@ -32,7 +35,7 @@ const CreatePost = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!photo || !description) {
+    if (!file || !description) {
       alert("Please provide a photo and a caption.");
       return;
     }
@@ -61,14 +64,19 @@ const CreatePost = () => {
       setPhoto(null);
       setFile(null);
       setDescription("");
+      navigate(-1);
     } catch (error) {
       console.error("Error creating post:", error);
       alert("An error occurred while creating the post. Please try again.");
     }
   };
 
+  const handleCancel = () => {
+    navigate(-1);
+  };
+
   return (
-    <div className="post card">
+    <div className="card create-post-container">
       <div className="card-content">
         <div className="media-container">
           <div className="media-left">
@@ -77,56 +85,50 @@ const CreatePost = () => {
             </figure>
           </div>
           <div className="media-content user-name">
-            <p className="title is-6" style={{ marginLeft: "5px" }}>
-              {User.username}
-            </p>
+            <p className="title is-6">{User.username}</p>
           </div>
         </div>
-        <h2 style={{ display: "flex", justifyContent: "center" }}>
-          Create a new post
-        </h2>
-        <div className="new-post">
-          <form
-            onSubmit={handleSubmit}
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}
-          >
+
+        <h2 className="create-post-title">Create a new Post</h2>
+
+        <form onSubmit={handleSubmit} className="create-post-form">
+          <label className="file-input-label">
+            <span>Choose File</span>
             <input
               type="file"
               onChange={handleFileChange}
-              style={{ marginBottom: "10px" }}
+              className="file-input"
+              accept="image/*"
             />
-            <div className="post-image" style={{ display: "flex" }}>
-              <figure
-                className="image"
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <img
-                  src={photo ? photo : "https://via.placeholder.com/150"}
-                  alt="Post"
-                />
-              </figure>
-            </div>
-            <input
-              type="text"
-              className="input"
-              placeholder="Add a caption..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              style={{ margin: "10px", border: "none" }}
-            />
-            <button
-              className="button"
-              type="submit"
-              style={{ marginBottom: "5px" }}
-            >
+          </label>
+          <div className="post-image-preview">
+            <figure className="image">
+              <img
+                src={photo ? photo : "https://via.placeholder.com/150"}
+                alt="Post Preview"
+              />
+            </figure>
+          </div>
+          <textarea
+            className="textarea caption-input"
+            placeholder="Add a caption..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          ></textarea>
+
+          <div className="buttons-container">
+            <button type="submit" className="button is-primary">
               Publish
             </button>
-          </form>
-        </div>
+            <button
+              type="button"
+              className="button is-light"
+              onClick={handleCancel}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
