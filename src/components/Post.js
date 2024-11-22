@@ -19,7 +19,7 @@ const Post = ({
 }) => {
   const [likeImg, setLikeImg] = useState(heart_img);
   const [currentLikes, setLikes] = useState(likes);
-  const [currentComments, setComments] = useState([]);
+  const [currentComments, setComments] = useState(comments || []);
   const [newComment, setNewComment] = useState("");
 
   const BASE_URL = "http://localhost:3001";
@@ -46,7 +46,7 @@ const Post = ({
         setLikeImg(black_heart_img);
         setLikes(currentLikes + 1);
       } catch (error) {
-        console.error("Error to add like", error);
+        console.error("Error adding like", error);
       }
     } else {
       try {
@@ -54,7 +54,7 @@ const Post = ({
         setLikeImg(heart_img);
         setLikes(currentLikes - 1);
       } catch (error) {
-        console.error("Error to remove like:", error);
+        console.error("Error removing like:", error);
       }
     }
   };
@@ -62,12 +62,13 @@ const Post = ({
   const handleAddComment = async (e) => {
     e.preventDefault();
     if (newComment.trim() === "") return;
+
     try {
       const comment = await addComment(postId, newComment);
       setComments([...currentComments, comment]);
       setNewComment("");
     } catch (error) {
-      console.error("Error al agregar comentario:", error);
+      console.error("Error adding comment:", error);
     }
   };
 
@@ -174,14 +175,14 @@ const Post = ({
             {currentLikes} likes
           </p>
           <p className="subtitle is-7" style={{ display: "flex" }}>
-            <strong className="pr-1" style={{ color: "#1E1E1E" }}>
-              {username}
-            </strong>{" "}
-            {caption}
+            <strong style={{ color: "#1E1E1E" }}>{username}</strong>
+            {caption && <span style={{ marginLeft: "5px" }}>{caption}</span>}
           </p>
-          <p className="subtitle is-7" style={{ display: "flex" }}>
-            View all {comments} comments
-          </p>
+          {currentComments.length > 0 && (
+            <p className="subtitle is-7" style={{ display: "flex" }}>
+              View all {currentComments.length} comments
+            </p>
+          )}
         </div>
         <form onSubmit={handleAddComment} className="add-comment mt-2">
           <input

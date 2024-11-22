@@ -10,9 +10,9 @@
 }
 
 .post-image img {
-  width: 100%;
-  height: auto;
-  object-fit: "cover";
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
 }
 
 .media-container {
