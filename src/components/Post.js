@@ -31,6 +31,14 @@ const Post = ({
     }
   }, [likes]);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
+  };
+
   const handleLike = async () => {
     if (likeImg === heart_img) {
       try {
@@ -122,15 +130,28 @@ const Post = ({
               <img src={profileImage} alt="Profile" />
             </figure>
           </div>
-          <div
-            className="media-content user-name"
-            onClick={handleProfileClick}
-            style={{ cursor: "pointer" }}
-          >
-            <p className="title is-6" style={{ marginRight: "3px" }}>
-              {username}
-            </p>
-            <p className="subtitle is-7">{time}</p>
+
+          <div className="media-content">
+            <div
+              className="user-info"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <p
+                className="title is-6 user-name"
+                onClick={handleProfileClick}
+                style={{
+                  marginRight: "auto",
+                  cursor: "pointer",
+                }}
+              >
+                {username}
+              </p>
+              <p className="subtitle is-7 post-time">{formatDate(time)}</p>
+            </div>
           </div>
         </div>
         <div className="post-image" style={{ display: "flex" }}>
@@ -144,10 +165,11 @@ const Post = ({
         <div className="content">
           <figure
             className="image is-24x24 my-2"
-            style={{ display: "flex", alignItems: "center" }}
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
           >
             <img src={likeImg} alt="Like" onClick={handleLike} />
           </figure>
+
           <p className="subtitle is-7" style={{ display: "flex" }}>
             {currentLikes} likes
           </p>

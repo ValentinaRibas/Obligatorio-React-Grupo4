@@ -9,7 +9,7 @@ const BASE_URL = "http://localhost:3001";
 const Profile = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
-  const [photos, setPhotos] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
@@ -39,6 +39,7 @@ const Profile = () => {
         setUsername(user.username);
         setDescription(user.description);
         setProfilePic(user.profilePicture);
+        setPosts(data.posts);
         const isAlreadyFriend = user.friends.some(
           (friend) => friend._id === currentUserId
         );
@@ -55,36 +56,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchUserData();
-    fetchUserPosts();
   }, [userId]);
-
-  const fetchUserPosts = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/posts/feed`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const userPosts = data.filter((post) => post.user._id === userId);
-        const imageUrls = userPosts.map((post) => ({
-          id: post._id,
-          imageUrl: `${BASE_URL}/${post.imageUrl}`,
-          caption: post.caption,
-          likes: post.likes.length,
-          comments: post.comments.length,
-          username: post.user.username,
-          profileImage: post.user.profilePicture,
-        }));
-        setPhotos(imageUrls);
-      } else {
-        console.error("Error fetching posts");
-      }
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-    }
-  };
 
   const handleAddFriend = async () => {
     try {
@@ -281,13 +253,10 @@ const Profile = () => {
             </div>
             <div className="profile-stats">
               <p>
-                <strong>{photos.length}</strong> posts
+                <strong>{posts.length}</strong> Posts
               </p>
               <p>
-                <strong>Followers</strong> {user.followers}
-              </p>
-              <p>
-                <strong>Following</strong> {user.following}
+                <strong>{user.friends.length}</strong> Friends
               </p>
             </div>
             <div className="profile-bio">
@@ -307,14 +276,14 @@ const Profile = () => {
         </div>
 
         <div className="profile-photos">
-          {photos.map((photo, index) => (
+          {posts.map((post, index) => (
             <button
               key={index}
               className="photo-button"
-              onClick={() => handleOpenModal(photo)}
+              onClick={() => handleOpenModal(post)}
             >
               <img
-                src={photo.imageUrl}
+                src={BASE_URL + "/" + post.imageUrl}
                 alt={`Post ${index}`}
                 className="profile-photo"
                 onError={(e) =>
@@ -337,14 +306,14 @@ const Profile = () => {
               &times;
             </button>
             <Post
-              postId={selectedPost.id}
-              profileImage={selectedPost.profileImage}
-              username={selectedPost.username}
-              time="2 hours ago"
-              image={selectedPost.imageUrl}
+              postId={selectedPost._id}
+              profileImage={profilePic}
+              username={username}
+              time={selectedPost.createdAt}
+              image={BASE_URL + "/" + selectedPost.imageUrl}
               caption={selectedPost.caption}
-              likes={selectedPost.likes}
-              comments={selectedPost.comments}
+              likes={selectedPost.likes.length}
+              comments={selectedPost.comments.length}
             />
           </div>
         </div>
