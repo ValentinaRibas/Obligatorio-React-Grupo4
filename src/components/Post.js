@@ -23,6 +23,7 @@ const Post = ({
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentsCount, setCommentsCount] = useState(comments);
+  const [notifications, setNotifications] = useState([]);
 
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
