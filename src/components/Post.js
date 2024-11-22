@@ -10,6 +10,8 @@ const Post = ({ postId, profileImage, username, time, image, caption, likes, com
   const [currentComments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
 
+  const BASE_URL = "http://localhost:3001";
+
   useEffect(() => {
     if (likes > 0) {
       setLikeImg(black_heart_img);
@@ -49,7 +51,7 @@ const Post = ({ postId, profileImage, username, time, image, caption, likes, com
   };
 
   const likePost = async (postId) => {
-    const response = await fetch(`/api/posts/${postId}/like`, {
+    const response = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -61,7 +63,7 @@ const Post = ({ postId, profileImage, username, time, image, caption, likes, com
   };
 
   const unlikePost = async (postId) => {
-    const response = await fetch(`/api/posts/${postId}/like`, {
+    const response = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -73,7 +75,7 @@ const Post = ({ postId, profileImage, username, time, image, caption, likes, com
   };
 
   const addComment = async (postId, comment) => {
-    const response = await fetch(`/api/posts/${postId}/comments`, {
+    const response = await fetch(`${BASE_URL}/api/posts/${postId}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

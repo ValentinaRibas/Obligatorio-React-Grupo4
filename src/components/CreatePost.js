@@ -2,22 +2,22 @@ import React, { useState } from 'react';
 import 'bulma/css/bulma.min.css';
 import '../styles/Post.css';
 
-const User = {
-    _id: 1,
-    username: "Juan",
-    profileImage: "https://via.placeholder.com/150"
-}
 
-const Create = ({}) => {
+const CreatePost = ({}) => {
     const [photo, setPhoto] = useState("")
+    const [file, setFile] = useState(null)
     const [description, setDescription] = useState("");
     const token = localStorage.getItem("token");
+    const User = JSON.parse(localStorage.getItem("user"));
+    const currentUserId = User?._id;
+    const BASE_URL = "http://localhost:3001";
 
     const handleFileChange = async (event) => {
       const file = event.target.files[0];
       if (file) {
         const base64 = await convertToBase64(file);
         setPhoto(base64);
+        setFile(file);
       }
     };
   
@@ -30,27 +30,26 @@ const Create = ({}) => {
       });
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         if (!photo || !description) {
           alert("Ingrese una foto y una descripción");
           return;
         }
-    
-        const postData = {
-            user: User,
-            imageUrl: photo || "",
-            caption: description,
-        };
+
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('user', User);
     
         try {
-          const response = await fetch('/api/posts',
+          const response = await fetch(`${BASE_URL}/api/posts/upload`,
             {
               method: "POST",
               headers: {
-                "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
               },
-              body: JSON.stringify(postData),
+              body: formData,
           });
           console.log(response.data);
           setPhoto(null);
@@ -66,7 +65,7 @@ const Create = ({}) => {
         <div className="media-container">
           <div className="media-left">
             <figure className="image is-48x48">
-              <img src={User.profileImage} alt="Profile" />
+              <img src={User.profilePicture} alt="Profile" />
             </figure>
           </div>
           <div className="media-content user-name">
@@ -98,4 +97,4 @@ const Create = ({}) => {
   );
 };
 
-export default Create;
+export default CreatePost;
