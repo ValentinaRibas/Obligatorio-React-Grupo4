@@ -11,6 +11,7 @@ import Login from "./components/Auth/Login/Login";
 import Register from "./components/Auth/Register/Register";
 import CreatePost from "./components/CreatePost";
 import Feed from "./components/Feed";
+import Notifications from "./components/Notifications";
 
 function App() {
   const isAuthenticated = !!localStorage.getItem("token");
@@ -44,6 +45,12 @@ function App() {
           <Route
             path="/profile/:userId"
             element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/notifications"
+            element={
+              isAuthenticated ? <Notifications /> : <Navigate to="/login" />
+            }
           />
         </Routes>
       </div>
