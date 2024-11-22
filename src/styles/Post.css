@@ -144,10 +144,7 @@
 .comments-container {
   max-height: 70px;
   overflow-y: auto;
-  /* margin-top: 5px; */
   padding-right: 5px;
-  /* border-top: 1px solid #dbdbdb; */
-  /* margin-bottom: 10px; */
 }
 
 .comments-container ul {
@@ -157,9 +154,26 @@
 }
 
 .comments-container li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.8rem;
 }
 
 .comments-container li:last-child {
   border-bottom: none;
+}
+
+.comment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-comment-button {
+  margin-left: 10px;
+  color: red;
+  cursor: pointer;
+  border: none;
+  background: none;
 }

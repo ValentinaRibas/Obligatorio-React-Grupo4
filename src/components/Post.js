@@ -22,6 +22,7 @@ const Post = ({
   const [currentComments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [commentsCount, setCommentsCount] = useState(comments);
 
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
@@ -68,6 +69,7 @@ const Post = ({
               if (commentResponse.ok) {
                 const commentData = await commentResponse.json();
                 return {
+                  id: commentId,
                   content: commentData.content,
                   username: commentData.user.username,
                 };
@@ -114,8 +116,32 @@ const Post = ({
       const comment = await addComment(postId, newComment);
       setComments([...currentComments, comment]);
       setNewComment("");
+      setCommentsCount((prev) => prev + 1);
     } catch (error) {
       console.error("Error adding comment:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/posts/${postId}/comments/${commentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setComments(currentComments.filter((c) => c.id !== commentId));
+        setCommentsCount((prev) => prev - 1);
+      } else {
+        console.error("Failed to delete comment");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -156,7 +182,7 @@ const Post = ({
       throw new Error("Failed to add comment");
     }
     const data = await response.json();
-    return data;
+    return { id: data._id, content: comment, username: username };
   };
 
   const handleProfileClick = () => {
@@ -174,14 +200,9 @@ const Post = ({
               <img
                 src={
                   profileImage ||
-                  "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0="
+                  "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png"
                 }
                 alt="Profile"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src =
-                    "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=";
-                }}
               />
             </figure>
           </div>
@@ -213,7 +234,7 @@ const Post = ({
             onClick={fetchComments}
             style={{ cursor: "pointer", color: "#3498db" }}
           >
-            View all {comments || 0} comments
+            View all {commentsCount} comments
           </p>
         </div>
 
@@ -221,8 +242,18 @@ const Post = ({
           <div className="comments-container">
             <ul>
               {currentComments.map((comment, index) => (
-                <li key={index}>
-                  <strong>{comment.username}</strong>: {comment.content}
+                <li key={index} className="comment-item">
+                  <span>
+                    <strong>{comment.username}</strong>: {comment.content}
+                  </span>
+                  {comment.username === username && (
+                    <button
+                      onClick={() => handleDeleteComment(comment.id)}
+                      className="delete-comment-button"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
