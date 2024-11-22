@@ -25,7 +25,7 @@ const LoginForm = () => {
           localStorage.setItem("token", data.token);
           localStorage.setItem("user", JSON.stringify(data));
           console.log(data);
-          navigate(`/profile/${data._id}`);
+          navigate(`/feed`);
         } else {
           console.error("Login failed");
         }

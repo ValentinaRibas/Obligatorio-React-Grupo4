@@ -31,6 +31,14 @@ const Post = ({
     }
   }, [likes]);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
+  };
+
   const handleLike = async () => {
     if (likeImg === heart_img) {
       try {
@@ -113,64 +121,68 @@ const Post = ({
     <div className="post card">
       <div className="card-content">
         <div className="media-container">
-          <div
-            className="media-left"
-            onClick={handleProfileClick}
-            style={{ cursor: "pointer" }}
-          >
+          <div className="media-left" onClick={handleProfileClick}>
             <figure className="image is-48x48">
               <img src={profileImage} alt="Profile" />
             </figure>
           </div>
-          <div
-            className="media-content user-name"
-            onClick={handleProfileClick}
-            style={{ cursor: "pointer" }}
-          >
-            <p className="title is-6" style={{ marginRight: "3px" }}>
+          <div className="media-content">
+            <p className="username" onClick={handleProfileClick}>
               {username}
             </p>
-            <p className="subtitle is-7">{time}</p>
           </div>
+          <p className="post-time">{formatDate(time)}</p>
         </div>
-        <div className="post-image" style={{ display: "flex" }}>
-          <figure
-            className="image"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            <img src={image} alt="Post" />
+
+        <div className="post-image">
+          <figure className="post-figure">
+            <img className="post-img" src={image} alt="Post" />
           </figure>
         </div>
+
         <div className="content">
           <figure
             className="image is-24x24 my-2"
-            style={{ display: "flex", alignItems: "center" }}
+            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
           >
             <img src={likeImg} alt="Like" onClick={handleLike} />
           </figure>
-          <p className="subtitle is-7" style={{ display: "flex" }}>
+          <p
+            className="subtitle is-7"
+            style={{ display: "flex", alignItems: "center" }}
+          >
             {currentLikes} likes
           </p>
-          <p className="subtitle is-7" style={{ display: "flex" }}>
-            <strong className="pr-1" style={{ color: "#1E1E1E" }}>
+          <p
+            className="subtitle is-7"
+            style={{ display: "flex", alignItems: "baseline" }}
+          >
+            <strong style={{ marginRight: "5px", color: "#1E1E1E" }}>
               {username}
-            </strong>{" "}
-            {caption}
+            </strong>
+            {caption && <span>{caption}</span>}
           </p>
-          <p className="subtitle is-7" style={{ display: "flex" }}>
+          <p
+            className="subtitle is-7"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              color: "#3498db",
+            }}
+          >
             View all {comments} comments
           </p>
         </div>
-        <form onSubmit={handleAddComment} className="add-comment mt-2">
+        <form onSubmit={handleAddComment} className="add-comment">
           <input
             type="text"
-            className="input"
+            className="add-comment-input"
             placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            style={{ padding: "10px", border: "none" }}
           />
-          <button type="submit" style={{ display: "none" }}>
+          <button type="submit" className="add-comment-button">
             Submit
           </button>
         </form>

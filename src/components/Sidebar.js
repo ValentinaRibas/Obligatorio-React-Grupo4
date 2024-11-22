@@ -12,8 +12,8 @@ const Sidebar = () => {
     <aside className="sidebar">
       <h1>fakestagram</h1>
       <ul>
-        <li className={location.pathname === "/" ? "active" : ""}>
-          <Link to="/">
+        <li className={location.pathname === "/feed" ? "active" : ""}>
+          <Link to="/feed">
             <FiHome className="sidebar-icon" /> Home
           </Link>
         </li>
@@ -27,7 +27,9 @@ const Sidebar = () => {
             <FiPlusSquare className="sidebar-icon" /> Create
           </Link>
         </li>
-        <li className={location.pathname === `/profile/${userId}` ? "active" : ""}>
+        <li
+          className={location.pathname === `/profile/${userId}` ? "active" : ""}
+        >
           {userId ? (
             <Link to={`/profile/${userId}`}>
               <FiUser className="sidebar-icon" /> Profile
