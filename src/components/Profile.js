@@ -10,6 +10,7 @@ const Profile = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
@@ -23,81 +24,86 @@ const Profile = () => {
   const currentUserId = storedUser?._id;
   const token = localStorage.getItem("token");
 
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const user = data.user;
+        setUser(user);
+        setUsername(user.username);
+        setDescription(user.description);
+        setProfilePic(user.profilePicture);
+        const isAlreadyFriend = user.friends.some(
+          (friend) => friend._id === currentUserId
+        );
+        setIsFriend(isAlreadyFriend);
+      } else {
+        console.error("Error fetching profile data");
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUser({
-            ...data.user,
-            followers: 1200,
-            following: 350,
-          });
-          setUsername(data.user.username);
-          setDescription(data.user.description);
-          setProfilePic(data.user.profilePicture);
-          setIsFriend(data.user.friends.includes(currentUserId));
-        } else {
-          console.error("Error fetching profile data");
-        }
-      } catch (error) {
-        console.error("Error fetching profile data:", error);
-      }
-    };
-
-    const fetchUserPosts = async () => {
-      try {
-        const response = await fetch(`${BASE_URL}/api/posts/feed`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          const userPosts = data.filter((post) => post.user._id === userId);
-          const imageUrls = userPosts.map((post) => ({
-            id: post._id,
-            imageUrl: `${BASE_URL}/${post.imageUrl}`,
-            caption: post.caption,
-            likes: post.likes.length,
-            comments: post.comments.length,
-            username: post.user.username,
-            profileImage: post.user.profilePicture,
-          }));
-          setPhotos(imageUrls);
-        } else {
-          console.error("Error fetching posts");
-        }
-      } catch (error) {
-        console.error("Error fetching posts:", error);
-      }
-    };
-
     fetchUserData();
     fetchUserPosts();
-  }, [userId, token, currentUserId]);
+  }, [userId]);
+
+  const fetchUserPosts = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/posts/feed`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const userPosts = data.filter((post) => post.user._id === userId);
+        const imageUrls = userPosts.map((post) => ({
+          id: post._id,
+          imageUrl: `${BASE_URL}/${post.imageUrl}`,
+          caption: post.caption,
+          likes: post.likes.length,
+          comments: post.comments.length,
+          username: post.user.username,
+          profileImage: post.user.profilePicture,
+        }));
+        setPhotos(imageUrls);
+      } else {
+        console.error("Error fetching posts");
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   const handleAddFriend = async () => {
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/user/add-friend/${userId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/user/add-friend/${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
       if (response.ok) {
         setIsFriend(true);
       } else {
-        console.error("Error adding friend");
+        const errorData = await response.json();
+        if (errorData.message === "Este usuario ya es tu amigo") {
+          setIsFriend(true);
+        }
+        console.error("Error adding friend:", errorData.message || response.statusText);
       }
     } catch (error) {
       console.error("Error adding friend:", error);
@@ -106,16 +112,13 @@ const Profile = () => {
 
   const handleRemoveFriend = async () => {
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/user/remove-friend/${userId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${BASE_URL}/api/user/remove-friend/${userId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         setIsFriend(false);
       } else {
@@ -129,12 +132,17 @@ const Profile = () => {
   const handleEditClick = () => setIsEditing(true);
 
   const handleSaveClick = async () => {
+    if (!username.trim() || !description.trim()) {
+      console.error("Username and description cannot be empty");
+      return;
+    }
+  
     const updatedData = {
       username: username || user.username,
       description: description || user.description,
-      profilePicture: profilePic || user.profilePicture
+      profilePicture: profilePic || user.profilePicture,
     };
-
+  
     try {
       const response = await fetch(`${BASE_URL}/api/user/profile/edit`, {
         method: "PUT",
@@ -144,19 +152,21 @@ const Profile = () => {
         },
         body: JSON.stringify(updatedData),
       });
-
+  
       if (!response.ok) {
-        throw new Error("Failed to update profile");
+        const errorData = await response.json();
+        console.error("Error updating profile:", errorData);
+        throw new Error(errorData.message || "Failed to update profile");
       }
-
+  
       const data = await response.json();
       setUser({ ...user, ...data });
       setIsEditing(false);
     } catch (error) {
-      console.error(error);
+      console.error("Error during profile update:", error);
     }
   };
-
+  
   const handleUsernameChange = (e) => setUsername(e.target.value);
   const handleDescriptionChange = (e) => setDescription(e.target.value);
 
@@ -171,7 +181,7 @@ const Profile = () => {
   };
 
   const handleImageClick = () => {
-    if(isEditing){
+    if (isEditing) {
       fileInputRef.current.click();
     }
   };
@@ -193,7 +203,11 @@ const Profile = () => {
     });
   };
 
-  if (!user) return <p>Loading...</p>;
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (!user) return <p>Profile not found</p>;
 
   return (
     <div className="profile-page">
@@ -207,11 +221,7 @@ const Profile = () => {
             onChange={handleFileChange}
           />
           <img
-            src={
-              profilePic
-                ? profilePic
-                : "https://via.placeholder.com/150"
-            }
+            src={profilePic ? profilePic : "https://via.placeholder.com/150"}
             alt="Profile"
             className="profile-image"
             onClick={handleImageClick}
@@ -282,9 +292,7 @@ const Profile = () => {
                 src={photo.imageUrl}
                 alt={`Post ${index}`}
                 className="profile-photo"
-                onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/250";
-                }}
+                onError={(e) => (e.target.src = "https://via.placeholder.com/250")}
               />
             </button>
           ))}
@@ -293,10 +301,7 @@ const Profile = () => {
 
       {isModalOpen && selectedPost && (
         <div className="custom-modal">
-          <div
-            className="custom-modal-overlay"
-            onClick={handleCloseModal}
-          ></div>
+          <div className="custom-modal-overlay" onClick={handleCloseModal}></div>
           <div className="custom-modal-content">
             <button className="close-button" onClick={handleCloseModal}>
               &times;

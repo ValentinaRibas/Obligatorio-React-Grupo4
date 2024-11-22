@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './Feed.css';  
+import '../styles/Feed.css';
 
 const FeedHeader = () => {
 

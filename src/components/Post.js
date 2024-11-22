@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import 'bulma/css/bulma.min.css';
 import '../styles/Post.css';
-import heart_img from '../images/heart.png'
-import black_heart_img from '../images/heart_black.png'
+import heart_img from '../images/heart.png';
+import black_heart_img from '../images/heart_black.png';
 
-const Post = ({ postId, profileImage, username, time, image, caption, likes, comments }) => {
+const Post = ({ postId, profileImage, username, userId, time, image, caption, likes, comments }) => {
   const [likeImg, setLikeImg] = useState(heart_img);
   const [currentLikes, setLikes] = useState(likes);
   const [currentComments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-
+  
   const BASE_URL = "http://localhost:3001";
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (likes > 0) {
@@ -90,16 +92,20 @@ const Post = ({ postId, profileImage, username, time, image, caption, likes, com
     return data;
   };
 
+  const handleProfileClick = () => {
+    navigate(`/profile/${userId}`);
+  };
+
   return (
     <div className="post card">
       <div className="card-content">
         <div className="media-container">
-          <div className="media-left">
+          <div className="media-left" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
             <figure className="image is-48x48">
               <img src={profileImage} alt="Profile" />
             </figure>
           </div>
-          <div className="media-content user-name">
+          <div className="media-content user-name" onClick={handleProfileClick} style={{ cursor: 'pointer' }}>
             <p className="title is-6" style={{ marginRight: '3px' }}>{username}</p>
             <p className="subtitle is-7">{time}</p>
           </div>
@@ -110,10 +116,10 @@ const Post = ({ postId, profileImage, username, time, image, caption, likes, com
           </figure>
         </div>
         <div className="content">
-        <figure className="image is-24x24 my-2" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={likeImg} alt="Profile" onClick={handleLike} />
-        </figure>
-        <p className="subtitle is-7" style={{ display: 'flex' }}>{currentLikes} likes</p>
+          <figure className="image is-24x24 my-2" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src={likeImg} alt="Like" onClick={handleLike} />
+          </figure>
+          <p className="subtitle is-7" style={{ display: 'flex' }}>{currentLikes} likes</p>
           <p className="subtitle is-7" style={{ display: 'flex' }}>
             <strong className='pr-1' style={{ color: '#1E1E1E' }}>{username}</strong> {caption}
           </p>
