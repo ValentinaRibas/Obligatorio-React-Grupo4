@@ -163,9 +163,26 @@ const Profile = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     setIsModalOpen(false);
     setSelectedPost(null);
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data.posts);
+      } else {
+        console.error("Error fetching updated posts after closing modal");
+      }
+    } catch (error) {
+      console.error("Error fetching updated posts:", error);
+    }
   };
 
   const handleImageClick = () => {
@@ -332,6 +349,7 @@ const Profile = () => {
               caption={selectedPost.caption}
               likes={selectedPost.likes.length}
               comments={selectedPost.comments.length}
+              onUpdate={fetchUserData}
             />
           </div>
         </div>

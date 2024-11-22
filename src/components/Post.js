@@ -72,6 +72,7 @@ const Post = ({
                   id: commentId,
                   content: commentData.content,
                   username: commentData.user.username,
+                  userId: commentData.user._id,
                 };
               }
               return null;
@@ -246,7 +247,7 @@ const Post = ({
                   <span>
                     <strong>{comment.username}</strong>: {comment.content}
                   </span>
-                  {comment.username === username && (
+                  {(comment.userId === currentUserId || currentUserId === userId) && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
                       className="delete-comment-button"
@@ -260,7 +261,7 @@ const Post = ({
           </div>
         )}
 
-        <form onSubmit={handleAddComment} className="add-comment">
+        <form onSubmit={(e) => handleAddComment(e)} className="add-comment">
           <input
             type="text"
             className="add-comment-input"
