@@ -22,6 +22,7 @@ const Post = ({
   const [currentComments, setComments] = useState([]);
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
+  const [commentsCount, setCommentsCount] = useState(comments);
 
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
@@ -68,8 +69,10 @@ const Post = ({
               if (commentResponse.ok) {
                 const commentData = await commentResponse.json();
                 return {
+                  id: commentId,
                   content: commentData.content,
                   username: commentData.user.username,
+                  userId: commentData.user._id,
                 };
               }
               return null;
@@ -114,8 +117,32 @@ const Post = ({
       const comment = await addComment(postId, newComment);
       setComments([...currentComments, comment]);
       setNewComment("");
+      setCommentsCount((prev) => prev + 1);
     } catch (error) {
       console.error("Error adding comment:", error);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/posts/${postId}/comments/${commentId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        setComments(currentComments.filter((c) => c.id !== commentId));
+        setCommentsCount((prev) => prev - 1);
+      } else {
+        console.error("Failed to delete comment");
+      }
+    } catch (error) {
+      console.error("Error deleting comment:", error);
     }
   };
 
@@ -156,24 +183,38 @@ const Post = ({
       throw new Error("Failed to add comment");
     }
     const data = await response.json();
-    return data;
+    return { id: data._id, content: comment, username: username };
   };
 
   const handleProfileClick = () => {
-    if (userId !== currentUserId) {
-      navigate(`/profile/${userId}`);
-    }
+    navigate(`/profile/${userId}`);
   };
 
   return (
     <div className="post card">
       <div className="card-content">
         <div className="media-container">
-          <div className="media-left" onClick={handleProfileClick}>
+          <div
+            className="media-left"
+            onClick={handleProfileClick}
+            style={{ cursor: "pointer" }}
+          >
             <figure className="image is-48x48">
-              <img src={profileImage} alt="Profile" />
+              <img
+                src={
+                  profileImage ||
+                  "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0="
+                }
+                alt="Profile"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=";
+                }}
+              />
             </figure>
           </div>
+
           <div className="media-content">
             <p className="username" onClick={handleProfileClick}>
               {username}
@@ -194,14 +235,17 @@ const Post = ({
             <p className="likes-text">{currentLikes} likes</p>
           </div>
           <p className="caption-text">
-            <strong>{username}</strong> {caption}
+            <strong style={{ cursor: "pointer" }} onClick={handleProfileClick}>
+              {username}
+            </strong>{" "}
+            {caption}
           </p>
           <p
             className="view-comments-text"
             onClick={fetchComments}
             style={{ cursor: "pointer", color: "#3498db" }}
           >
-            View all {comments || 0} comments
+            View all {commentsCount} comments
           </p>
         </div>
 
@@ -209,15 +253,26 @@ const Post = ({
           <div className="comments-container">
             <ul>
               {currentComments.map((comment, index) => (
-                <li key={index}>
-                  <strong>{comment.username}</strong>: {comment.content}
+                <li key={index} className="comment-item">
+                  <span>
+                    <strong>{comment.username}</strong>: {comment.content}
+                  </span>
+                  {(comment.userId === currentUserId ||
+                    currentUserId === userId) && (
+                    <button
+                      onClick={() => handleDeleteComment(comment.id)}
+                      className="delete-comment-button"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
           </div>
         )}
 
-        <form onSubmit={handleAddComment} className="add-comment">
+        <form onSubmit={(e) => handleAddComment(e)} className="add-comment">
           <input
             type="text"
             className="add-comment-input"

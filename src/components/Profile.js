@@ -163,9 +163,26 @@ const Profile = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     setIsModalOpen(false);
     setSelectedPost(null);
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data.posts);
+      } else {
+        console.error("Error fetching updated posts after closing modal");
+      }
+    } catch (error) {
+      console.error("Error fetching updated posts:", error);
+    }
   };
 
   const handleImageClick = () => {
@@ -177,6 +194,13 @@ const Profile = () => {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
+      const maxSize = 80 * 1024;
+
+      if (file.size > maxSize) {
+        alert("Please upload a file smaller than 80KB");
+        return;
+      }
+
       const base64 = await convertToBase64(file);
       setProfilePic(base64);
     }
@@ -209,12 +233,21 @@ const Profile = () => {
             onChange={handleFileChange}
           />
           <img
-            src={profilePic ? profilePic : "https://via.placeholder.com/150"}
+            src={
+              profilePic ||
+              "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0="
+            }
             alt="Profile"
             className="profile-image"
             onClick={handleImageClick}
             style={{ cursor: isEditing ? "pointer" : "default" }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src =
+                "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=";
+            }}
           />
+
           <div className="profile-details">
             <div className="username-edit-container">
               {isEditing ? (
@@ -316,6 +349,7 @@ const Profile = () => {
               caption={selectedPost.caption}
               likes={selectedPost.likes.length}
               comments={selectedPost.comments.length}
+              onUpdate={fetchUserData}
             />
           </div>
         </div>
