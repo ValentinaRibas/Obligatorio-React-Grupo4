@@ -309,6 +309,8 @@ const Profile = () => {
               postId={selectedPost._id}
               profileImage={profilePic}
               username={username}
+              userId={userId}
+              currentUserId={currentUserId}
               time={selectedPost.createdAt}
               image={BASE_URL + "/" + selectedPost.imageUrl}
               caption={selectedPost.caption}

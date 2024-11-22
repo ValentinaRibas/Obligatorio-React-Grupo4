@@ -20,10 +20,13 @@ const Post = ({
   const [likeImg, setLikeImg] = useState(heart_img);
   const [currentLikes, setLikes] = useState(likes);
   const [currentComments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
 
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     if (likes > 0) {
@@ -37,6 +40,51 @@ const Post = ({
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = String(date.getFullYear()).slice(-2);
     return `${day}/${month}/${year}`;
+  };
+
+  const fetchComments = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/profile/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const userData = await response.json();
+
+      if (response.ok && userData.posts) {
+        const post = userData.posts.find((p) => p._id === postId);
+
+        if (post && Array.isArray(post.comments)) {
+          const fetchedComments = await Promise.all(
+            post.comments.map(async (commentId) => {
+              const commentResponse = await fetch(
+                `${BASE_URL}/api/posts/comments/${commentId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+              if (commentResponse.ok) {
+                const commentData = await commentResponse.json();
+                return {
+                  content: commentData.content,
+                  username: commentData.user.username,
+                };
+              }
+              return null;
+            })
+          );
+
+          setComments(fetchedComments.filter(Boolean));
+          setShowComments(!showComments);
+        }
+      } else {
+        console.error("Failed to fetch post or comments:", userData);
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
   };
 
   const handleLike = async () => {
@@ -67,7 +115,7 @@ const Post = ({
       setComments([...currentComments, comment]);
       setNewComment("");
     } catch (error) {
-      console.error("Error al agregar comentario:", error);
+      console.error("Error adding comment:", error);
     }
   };
 
@@ -75,7 +123,7 @@ const Post = ({
     const response = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -87,7 +135,7 @@ const Post = ({
     const response = await fetch(`${BASE_URL}/api/posts/${postId}/like`, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -100,7 +148,7 @@ const Post = ({
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ content: comment }),
     });
@@ -141,39 +189,34 @@ const Post = ({
         </div>
 
         <div className="content">
-          <figure
-            className="image is-24x24 my-2"
-            style={{ display: "flex", alignItems: "center", cursor: "pointer" }}
-          >
+          <div className="likes-container">
             <img src={likeImg} alt="Like" onClick={handleLike} />
-          </figure>
-          <p
-            className="subtitle is-7"
-            style={{ display: "flex", alignItems: "center" }}
-          >
-            {currentLikes} likes
+            <p className="likes-text">{currentLikes} likes</p>
+          </div>
+          <p className="caption-text">
+            <strong>{username}</strong> {caption}
           </p>
           <p
-            className="subtitle is-7"
-            style={{ display: "flex", alignItems: "baseline" }}
+            className="view-comments-text"
+            onClick={fetchComments}
+            style={{ cursor: "pointer", color: "#3498db" }}
           >
-            <strong style={{ marginRight: "5px", color: "#1E1E1E" }}>
-              {username}
-            </strong>
-            {caption && <span>{caption}</span>}
-          </p>
-          <p
-            className="subtitle is-7"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              cursor: "pointer",
-              color: "#3498db",
-            }}
-          >
-            View all {comments} comments
+            View all {comments || 0} comments
           </p>
         </div>
+
+        {showComments && (
+          <div className="comments-container">
+            <ul>
+              {currentComments.map((comment, index) => (
+                <li key={index}>
+                  <strong>{comment.username}</strong>: {comment.content}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <form onSubmit={handleAddComment} className="add-comment">
           <input
             type="text"
