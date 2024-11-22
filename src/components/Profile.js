@@ -140,6 +140,13 @@ const Profile = () => {
 
   const handleEditClick = () => setIsEditing(true);
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setUsername(user.username);
+    setDescription(user.description);
+    setProfilePic(user.profilePicture);
+  };
+
   const handleSaveClick = async () => {
     const updatedData = {
       username: username || user.username,
@@ -234,27 +241,36 @@ const Profile = () => {
             alt="Profile"
             className="profile-image"
             onClick={handleImageClick}
+            style={{ cursor: isEditing ? "pointer" : "default" }}
           />
           <div className="profile-details">
             <div className="username-edit-container">
               {isEditing ? (
-                <input
-                  type="text"
-                  value={username}
-                  onChange={handleUsernameChange}
-                  className="username-input"
-                />
+                <>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={handleUsernameChange}
+                    className="username-input"
+                  />
+                  <button className="edit-button" onClick={handleSaveClick}>
+                    Save
+                  </button>
+                  <button className="cancel-button" onClick={handleCancelEdit}>
+                    Cancel
+                  </button>
+                </>
               ) : (
-                <h2>{username}</h2>
+                <>
+                  <h2>{username}</h2>
+                  {userId === currentUserId && (
+                    <button className="edit-button" onClick={handleEditClick}>
+                      Edit Profile
+                    </button>
+                  )}
+                </>
               )}
-              {userId === currentUserId ? (
-                <button
-                  className="edit-button"
-                  onClick={isEditing ? handleSaveClick : handleEditClick}
-                >
-                  {isEditing ? "Save" : "Edit Profile"}
-                </button>
-              ) : (
+              {userId !== currentUserId && (
                 <button
                   className="edit-button"
                   onClick={isFriend ? handleRemoveFriend : handleAddFriend}
