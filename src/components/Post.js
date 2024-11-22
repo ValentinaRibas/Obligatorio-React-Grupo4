@@ -187,23 +187,30 @@ const Post = ({
   };
 
   const handleProfileClick = () => {
-    if (userId !== currentUserId) {
-      navigate(`/profile/${userId}`);
-    }
+    navigate(`/profile/${userId}`);
   };
 
   return (
     <div className="post card">
       <div className="card-content">
         <div className="media-container">
-          <div className="media-left" onClick={handleProfileClick}>
+          <div
+            className="media-left"
+            onClick={handleProfileClick}
+            style={{ cursor: "pointer" }}
+          >
             <figure className="image is-48x48">
               <img
                 src={
                   profileImage ||
-                  "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png"
+                  "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0="
                 }
                 alt="Profile"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://media.istockphoto.com/id/1223671392/vector/default-profile-picture-avatar-photo-placeholder-vector-illustration.jpg?s=612x612&w=0&k=20&c=s0aTdmT5aU6b8ot7VKm11DeID6NctRCpB755rA1BIP0=";
+                }}
               />
             </figure>
           </div>
@@ -228,7 +235,10 @@ const Post = ({
             <p className="likes-text">{currentLikes} likes</p>
           </div>
           <p className="caption-text">
-            <strong>{username}</strong> {caption}
+            <strong style={{ cursor: "pointer" }} onClick={handleProfileClick}>
+              {username}
+            </strong>{" "}
+            {caption}
           </p>
           <p
             className="view-comments-text"
@@ -247,7 +257,8 @@ const Post = ({
                   <span>
                     <strong>{comment.username}</strong>: {comment.content}
                   </span>
-                  {(comment.userId === currentUserId || currentUserId === userId) && (
+                  {(comment.userId === currentUserId ||
+                    currentUserId === userId) && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
                       className="delete-comment-button"
