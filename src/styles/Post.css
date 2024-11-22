@@ -145,6 +145,26 @@
   max-height: 70px;
   overflow-y: auto;
   padding-right: 5px;
+  scrollbar-gutter: stable;
+}
+
+.comments-container::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+
+.comments-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+.comments-container::-webkit-scrollbar-thumb:hover {
+  background-color: #888;
+}
+
+.comments-container {
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
 .comments-container ul {
