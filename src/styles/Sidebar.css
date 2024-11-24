@@ -1,4 +1,7 @@
 .sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: 200px;
   background-color: #f4f4f4;
   padding: 20px;
@@ -15,6 +18,8 @@
 .sidebar ul {
   list-style: none;
   padding: 0;
+  margin: 0;
+  flex-grow: 1;
 }
 
 .sidebar ul li {
@@ -60,4 +65,27 @@
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
   margin-left: 0.5rem;
+}
+
+.logout-button {
+  /* margin-top: auto; */
+  color: rgb(226, 0, 0);
+  padding: 10px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  text-align: left;
+}
+
+.logout-button:hover {
+  /* background-color: #c0392b; */
+  color: rgb(238, 132, 132);
+}
+
+.logout-button .sidebar-icon {
+  margin-right: 10px;
 }

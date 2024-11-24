@@ -1,12 +1,23 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css";
-import { FiHome, FiHeart, FiPlusSquare, FiUser } from "react-icons/fi";
+import {
+  FiHome,
+  FiHeart,
+  FiPlusSquare,
+  FiUser,
+  FiLogOut,
+} from "react-icons/fi";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const userId = storedUser ? storedUser._id : null;
+
+  const handleLogout = () => {
+    navigate("/login");
+  };
 
   return (
     <aside className="sidebar">
@@ -41,6 +52,9 @@ const Sidebar = () => {
           )}
         </li>
       </ul>
+      <button className="logout-button" onClick={handleLogout}>
+        <FiLogOut className="sidebar-icon" /> Logout
+      </button>
     </aside>
   );
 };

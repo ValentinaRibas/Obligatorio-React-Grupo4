@@ -5,10 +5,21 @@ const RegisterForm = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!username) {
+      setError("Username cannot be empty.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address.");
+      return;
+    }
 
     fetch("http://localhost:3001/api/auth/register", {
       method: "POST",
@@ -29,20 +40,39 @@ const RegisterForm = () => {
           console.log(data);
           navigate(`/profile/${data._id}`);
         } else {
-          console.error("Registration failed");
+          setError("Registration failed. Please try again.");
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.error(err);
+        setError("An error occurred. Please try again later.");
+      });
   };
 
   return (
     <div className="register-form">
       <label htmlFor="username">Username</label>
-      <input type="text" onChange={(e) => setUsername(e.target.value)} />
+      <input
+        type="text"
+        id="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
       <label htmlFor="email">Email</label>
-      <input type="email" onChange={(e) => setEmail(e.target.value)} />
+      <input
+        type="email"
+        id="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <label htmlFor="password">Password</label>
-      <input type="password" onChange={(e) => setPassword(e.target.value)} />
+      <input
+        type="password"
+        id="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <button onClick={handleSubmit}>Register</button>
       <div className="login-link-container">
         <p>
