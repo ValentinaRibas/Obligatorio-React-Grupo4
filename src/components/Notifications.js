@@ -33,7 +33,8 @@ const Notifications = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setNotifications(data.user.notifications || []);
+        const sortedNotifications = data.user.notifications || [];
+        setNotifications(sortedNotifications.reverse());
       } else {
         console.error("Failed to fetch notifications");
       }
