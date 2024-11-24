@@ -98,7 +98,7 @@ const Notifications = () => {
                   </strong>{" "}
                   {notification.type === "follow" && "started following you"}
                   {notification.type === "like" &&
-                    `liked your post (ID: ${notification.postId}).`}
+                    `liked your post (ID: ${notification.postId})`}
                   {notification.type === "comment" &&
                     `commented on your post (ID: ${notification.postId})`}
                 </p>
