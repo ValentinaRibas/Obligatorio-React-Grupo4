@@ -3,6 +3,7 @@
   background-color: #f4f4f4;
   padding: 20px;
   text-align: center;
+  height: 100vh;
 }
 
 .sidebar h1 {
@@ -59,26 +60,4 @@
   padding: 0.2rem 0.5rem;
   font-size: 0.75rem;
   margin-left: 0.5rem;
-}
-
-.notifications-list {
-  position: absolute;
-  top: 50px;
-  right: 10px;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  width: 250px;
-  max-height: 400px;
-  overflow-y: auto;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.notification-item {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-}
-
-.notification-item:last-child {
-  border-bottom: none;
 }
