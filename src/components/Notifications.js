@@ -80,20 +80,19 @@ const Notifications = () => {
   if (isLoading) return <p>Loading notifications...</p>;
 
   return (
-    <div className="instagram-container">
+    <div className="notifications-page">
       <Sidebar />
-      <main className="main">
+      <main className="notifications-main">
         {notifications.length === 0 ? (
           <p>No notifications</p>
         ) : (
-          <div className="notifications-list">
+          <div className="notifications-content-list">
             {notifications.map((notification) => (
-              <div key={notification._id} className="notification-item">
+              <div key={notification._id} className="notifications-item">
                 <p>
                   <strong
-                    className="clickable-username"
+                    className="notifications-clickable-username"
                     onClick={() => handleUserClick(notification.fromUserId)}
-                    style={{ cursor: "pointer", color: "#3498db" }}
                   >
                     {getUsername(notification.fromUserId)}
                   </strong>{" "}
@@ -103,15 +102,14 @@ const Notifications = () => {
                   {notification.type === "comment" &&
                     `commented on your post (ID: ${notification.postId})`}
                 </p>
-                <p className="notification-date">
-                  {new Date(notification.createdAt).toLocaleDateString(
-                    "es-ES",
-                    {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    }
-                  )}
+                <p className="notifications-date">
+                  {new Date(notification.createdAt).toLocaleString("es-ES", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
             ))}
