@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "../styles/Notifications.css";
+import { AuthContext } from "../context/AuthContext";
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -9,21 +10,19 @@ const Notifications = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = storedUser?._id;
-  const token = localStorage.getItem("token");
+  const { user: currentUser, token } = useContext(AuthContext);
   const BASE_URL = "http://localhost:3001";
 
   const fetchNotifications = async () => {
-    if (!currentUserId) {
-      console.error("User ID not found in local storage");
+    if (!currentUser?._id) {
+      console.error("User ID not found in context");
       setIsLoading(false);
       return;
     }
 
     try {
       const response = await fetch(
-        `${BASE_URL}/api/user/profile/${currentUserId}`,
+        `${BASE_URL}/api/user/profile/${currentUser._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

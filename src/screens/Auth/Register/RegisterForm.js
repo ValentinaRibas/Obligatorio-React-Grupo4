@@ -1,52 +1,39 @@
-import { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../../context/AuthContext";
 
 const RegisterForm = () => {
-  const [username, setUsername] = useState("");
+  const { register } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!username) {
-      setError("Username cannot be empty.");
+      setError("Username cannot be empty");
       return;
     }
 
     if (!email.includes("@")) {
-      setError("Please enter a valid email address.");
+      setError("Please enter a valid email address");
       return;
     }
 
-    fetch("http://localhost:3001/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        password: password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.token && data._id) {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user", JSON.stringify(data));
-          console.log(data);
-          navigate(`/profile/${data._id}`);
-        } else {
-          setError("Registration failed. Please try again.");
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("An error occurred. Please try again later.");
-      });
+    if (!password) {
+      setError("Password cannot be empty");
+      return;
+    }
+
+    const success = await register(email, password, username);
+    if (success) {
+      navigate("/login");
+    } else {
+      setError("Registration failed. Please try again");
+    }
   };
 
   return (
@@ -65,7 +52,6 @@ const RegisterForm = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
-      {error && <p style={{ color: "red" }}>{error}</p>}
       <label htmlFor="password">Password</label>
       <input
         type="password"
@@ -73,6 +59,7 @@ const RegisterForm = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
+      {error && <p style={{ color: "red" }}>{error}</p>}
       <button onClick={handleSubmit}>Register</button>
       <div className="login-link-container">
         <p>
