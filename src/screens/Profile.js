@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
 import "../styles/Profile.css";
 import Sidebar from "../components/Sidebar";
 import Post from "../components/Post";
+import { AuthContext } from "../context/AuthContext";
 
 const BASE_URL = "http://localhost:3001";
 
@@ -20,9 +21,7 @@ const Profile = () => {
   const [selectedPost, setSelectedPost] = useState(null);
   const [isFriend, setIsFriend] = useState(false);
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = storedUser?._id;
-  const token = localStorage.getItem("token");
+  const { user: currentUser, token } = useContext(AuthContext);
 
   const fetchUserData = async () => {
     try {
@@ -41,7 +40,7 @@ const Profile = () => {
         setProfilePic(user.profilePicture);
         setPosts(data.posts);
         const isAlreadyFriend = user.friends.some(
-          (friend) => friend._id === currentUserId
+          (friend) => friend._id === currentUser._id
         );
         setIsFriend(isAlreadyFriend);
       } else {
@@ -268,14 +267,14 @@ const Profile = () => {
               ) : (
                 <>
                   <h2>{username}</h2>
-                  {userId === currentUserId && (
+                  {userId === currentUser._id && (
                     <button className="edit-button" onClick={handleEditClick}>
                       Edit Profile
                     </button>
                   )}
                 </>
               )}
-              {userId !== currentUserId && (
+              {userId !== currentUser._id && (
                 <button
                   className="edit-button"
                   onClick={isFriend ? handleRemoveFriend : handleAddFriend}
@@ -343,7 +342,7 @@ const Profile = () => {
               profileImage={profilePic}
               username={username}
               userId={userId}
-              currentUserId={currentUserId}
+              currentUserId={currentUser._id}
               time={selectedPost.createdAt}
               image={BASE_URL + "/" + selectedPost.imageUrl}
               caption={selectedPost.caption}

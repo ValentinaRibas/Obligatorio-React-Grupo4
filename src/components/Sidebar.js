@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/Sidebar.css";
 import {
@@ -8,14 +8,15 @@ import {
   FiUser,
   FiLogOut,
 } from "react-icons/fi";
+import { AuthContext } from "../context/AuthContext";
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const userId = storedUser ? storedUser._id : null;
+  const { user, logout } = useContext(AuthContext);
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 
@@ -39,10 +40,12 @@ const Sidebar = () => {
           </Link>
         </li>
         <li
-          className={location.pathname === `/profile/${userId}` ? "active" : ""}
+          className={
+            location.pathname === `/profile/${user?._id}` ? "active" : ""
+          }
         >
-          {userId ? (
-            <Link to={`/profile/${userId}`}>
+          {user ? (
+            <Link to={`/profile/${user._id}`}>
               <FiUser className="sidebar-icon" /> Profile
             </Link>
           ) : (

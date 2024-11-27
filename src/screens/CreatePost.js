@@ -1,16 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import "../styles/CreatePost.css";
+import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const CreatePost = () => {
   const [photo, setPhoto] = useState("");
   const [file, setFile] = useState(null);
   const [description, setDescription] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
 
-  const token = localStorage.getItem("token");
-  const User = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = User?._id;
+  const { user, token } = useContext(AuthContext);
   const BASE_URL = "http://localhost:3001";
+  const navigate = useNavigate();
+
+  const fetchUpdatedProfile = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/user/profile/${user._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProfilePicture(
+          data.user.profilePicture || "https://via.placeholder.com/150"
+        );
+      } else {
+        console.error("Failed to fetch updated user data");
+        setProfilePicture("https://via.placeholder.com/150");
+      }
+    } catch (error) {
+      console.error("Error fetching updated profile picture:", error);
+      setProfilePicture("https://via.placeholder.com/150");
+    }
+  };
+
+  useEffect(() => {
+    fetchUpdatedProfile();
+  }, [user, token]);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -34,14 +63,14 @@ const CreatePost = () => {
     e.preventDefault();
 
     if (!file || !description) {
-      alert("Please provide a photo and a caption.");
+      alert("Please provide a photo and a caption");
       return;
     }
 
     const formData = new FormData();
     formData.append("image", file);
     formData.append("caption", description);
-    formData.append("user", currentUserId);
+    formData.append("user", user._id);
 
     try {
       const response = await fetch(`${BASE_URL}/api/posts/upload`, {
@@ -54,7 +83,7 @@ const CreatePost = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create post.");
+        throw new Error(errorData.message || "Failed to create post");
       }
 
       const responseData = await response.json();
@@ -62,10 +91,11 @@ const CreatePost = () => {
       setPhoto(null);
       setFile(null);
       setDescription("");
-      window.location.href = "/feed";
+
+      navigate("/feed");
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("An error occurred while creating the post. Please try again.");
+      alert("An error occurred while creating the post. Please try again");
     }
   };
 
@@ -79,15 +109,17 @@ const CreatePost = () => {
               <div className="media-left">
                 <figure className="image is-48x48">
                   <img
-                    src={
-                      User?.profilePicture || "https://via.placeholder.com/150"
-                    }
+                    src={profilePicture}
                     alt="Profile"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "https://via.placeholder.com/150";
+                    }}
                   />
                 </figure>
               </div>
               <div className="media-content user-name">
-                <p className="title is-6">{User?.username}</p>
+                <p className="title is-6">{user?.username}</p>
               </div>
             </div>
 
@@ -125,7 +157,7 @@ const CreatePost = () => {
                 <button
                   type="button"
                   className="button is-light"
-                  onClick={() => window.history.back()}
+                  onClick={() => navigate(-1)}
                 >
                   Cancel
                 </button>

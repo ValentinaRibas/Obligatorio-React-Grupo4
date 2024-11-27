@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import "bulma/css/bulma.min.css";
 import "../styles/Post.css";
 import heart_img from "../images/heart.png";
 import black_heart_img from "../images/heart_black.png";
+import { AuthContext } from "../context/AuthContext";
 
 const Post = ({
   postId,
   profileImage,
   username,
   userId,
-  currentUserId,
   time,
   image,
   caption,
@@ -23,12 +23,11 @@ const Post = ({
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState("");
   const [commentsCount, setCommentsCount] = useState(comments);
-  const [notifications, setNotifications] = useState([]);
 
   const BASE_URL = "http://localhost:3001";
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
+  const { token, user } = useContext(AuthContext);
 
   useEffect(() => {
     if (likes > 0) {
@@ -258,8 +257,7 @@ const Post = ({
                   <span>
                     <strong>{comment.username}</strong>: {comment.content}
                   </span>
-                  {(comment.userId === currentUserId ||
-                    currentUserId === userId) && (
+                  {(comment.userId === user._id || user._id === userId) && (
                     <button
                       onClick={() => handleDeleteComment(comment.id)}
                       className="delete-comment-button"

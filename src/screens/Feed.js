@@ -1,47 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/Feed.css";
 import Post from "../components/Post";
 import Sidebar from "../components/Sidebar";
+import { AuthContext } from "../context/AuthContext";
 
 const Feed = () => {
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
-  const token = localStorage.getItem("token");
+  const { token, user: currentUser } = useContext(AuthContext);
+  const navigate = useNavigate();
   const apiUrl = "http://localhost:3001";
 
-  const storedUser = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = storedUser?._id;
-
   const getPosts = async () => {
-    const response = await fetch(`${apiUrl}/api/posts/feed`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
-    if (response.ok) {
-      const formattedPosts = data.map((post) => ({
-        ...post,
-        comments: post.comments.length,
-      }));
-      setPosts(formattedPosts);
-    } else {
-      console.error("Failed to fetch posts:", data);
+    try {
+      const response = await fetch(`${apiUrl}/api/posts/feed`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const formattedPosts = data.map((post) => ({
+          ...post,
+          comments: post.comments.length,
+        }));
+        setPosts(formattedPosts);
+      } else {
+        console.error("Failed to fetch posts:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
     }
   };
 
   const getUsers = async () => {
-    const response = await fetch(`${apiUrl}/api/user/all`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await response.json();
-    if (response.ok) {
-      const filteredUsers = data.filter((user) => user._id !== currentUserId);
-      setUsers(filteredUsers);
-    } else {
-      console.error("Failed to fetch users:", data);
+    try {
+      const response = await fetch(`${apiUrl}/api/user/all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const filteredUsers = data.filter(
+          (user) => user._id !== currentUser._id
+        );
+        setUsers(filteredUsers);
+      } else {
+        console.error("Failed to fetch users:", data);
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
     }
   };
 
@@ -51,7 +61,7 @@ const Feed = () => {
   }, []);
 
   const handleViewProfile = (userId) => {
-    window.location.href = `/profile/${userId}`;
+    navigate(`/profile/${userId}`);
   };
 
   return (
@@ -103,7 +113,7 @@ const Feed = () => {
               }
               username={post.user.username}
               userId={post.user._id}
-              currentUserId={currentUserId}
+              currentUserId={currentUser._id}
               time={post.createdAt}
               image={apiUrl + "/" + post.imageUrl}
               caption={post.caption}
