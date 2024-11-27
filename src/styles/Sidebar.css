@@ -3,10 +3,11 @@
   flex-direction: column;
   justify-content: space-between;
   width: 200px;
-  background-color: #f4f4f4;
+  background: linear-gradient(135deg, #f57ca8 0%, #72dad3 100%);
   padding: 20px;
   text-align: center;
   height: 100vh;
+  color: #fff;
 }
 
 .sidebar h1 {
@@ -28,12 +29,12 @@
   margin-bottom: 20px;
   cursor: pointer;
   font-size: 16px;
-  color: #333;
+  color: #ffffff;
 }
 
 .sidebar ul li.active {
   font-weight: bold;
-  color: #000;
+  color: #ffffff;
 }
 
 .sidebar ul li a {
