@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../styles/Feed.css";
-import Post from "./Post";
+import Post from "../components/Post";
 import Sidebar from "../components/Sidebar";
 
 const Feed = () => {

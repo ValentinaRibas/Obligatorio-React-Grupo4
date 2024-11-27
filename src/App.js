@@ -6,12 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./App.css";
-import Profile from "./components/Profile";
+import Profile from "./screens/Profile";
 import Login from "./components/Auth/Login/Login";
 import Register from "./components/Auth/Register/Register";
-import CreatePost from "./components/CreatePost";
-import Feed from "./components/Feed";
-import Notifications from "./components/Notifications";
+import CreatePost from "./screens/CreatePost";
+import Feed from "./screens/Feed";
+import Notifications from "./screens/Notifications";
 
 function App() {
   const isAuthenticated = !!localStorage.getItem("token");
