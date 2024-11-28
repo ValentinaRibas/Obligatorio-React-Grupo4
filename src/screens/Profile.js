@@ -193,10 +193,10 @@ const Profile = () => {
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const maxSize = 80 * 1024;
+      const maxSize = 75 * 1024;
 
       if (file.size > maxSize) {
-        alert("Please upload a file smaller than 80KB");
+        alert("Please upload a file smaller than 75KB");
         return;
       }
 

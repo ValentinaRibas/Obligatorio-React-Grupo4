@@ -4,7 +4,7 @@ export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [token, setToken] = useState(null);
 
   const login = async (email, password) => {
     try {
@@ -17,8 +17,6 @@ const AuthProvider = ({ children }) => {
       });
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data));
         setUser(data);
         setToken(data.token);
         return true;
@@ -53,8 +51,6 @@ const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     setUser(null);
     setToken(null);
   };
